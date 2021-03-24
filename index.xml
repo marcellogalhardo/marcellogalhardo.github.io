@@ -275,13 +275,7 @@ errorPlaceholder = R.drawable.error_placeholder
 }
 }
 &lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="conclusion">Conclusion&lt;/h1>
-&lt;p>As you can see, the Kotlin Standard library can be a good source of inspiration when designing code aiming for better discoverability between Kotlin Developers through the consistent pattern the language follows. Why not take advantage of that?&lt;/p></description></item><item><title>About</title><link>https://marcellogalhardo.dev/about/</link><pubDate>Wed, 01 Jan 2020 09:02:50 +0100</pubDate><guid>https://marcellogalhardo.dev/about/</guid><description>&lt;p>Software engineer with over 5 years of experience with Android. I am a moderator of the Android Dev BR community, the largest network of Android developers in Brazil.&lt;/p>
-&lt;h3 id="contact-me">Contact me&lt;/h3>
-&lt;ul>
-&lt;li>Email: &lt;a href="mailto:marcello.galhardo@gmail.com">marcello.galhardo@gmail.com&lt;/a>&lt;/li>
-&lt;li>Twitter: &lt;a href="https://twitter.com/marcellogalhard">@marcellogalhard&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://www.linkedin.com/in/marcellogalhardo/">LinkedIn&lt;/a>&lt;/li>
-&lt;/ul></description></item><item><title>Dagger, ViewModels and Fragments</title><link>https://marcellogalhardo.dev/blog/2020/01/01/dagger-viewmodels-and-fragments/</link><pubDate>Wed, 01 Jan 2020 09:02:50 +0100</pubDate><guid>https://marcellogalhardo.dev/blog/2020/01/01/dagger-viewmodels-and-fragments/</guid><description>&lt;p>Dagger is a powerful DI framework but when combined with Architecture Components from Android it might cause some boilerplate: mainly when using ViewModels and Fragments with constructor injection.&lt;/p>
+&lt;p>As you can see, the Kotlin Standard library can be a good source of inspiration when designing code aiming for better discoverability between Kotlin Developers through the consistent pattern the language follows. Why not take advantage of that?&lt;/p></description></item><item><title>Dagger, ViewModels and Fragments</title><link>https://marcellogalhardo.dev/blog/2020/01/01/dagger-viewmodels-and-fragments/</link><pubDate>Wed, 01 Jan 2020 09:02:50 +0100</pubDate><guid>https://marcellogalhardo.dev/blog/2020/01/01/dagger-viewmodels-and-fragments/</guid><description>&lt;p>Dagger is a powerful DI framework but when combined with Architecture Components from Android it might cause some boilerplate: mainly when using ViewModels and Fragments with constructor injection.&lt;/p>
 &lt;p>Kotlin offers many options to deal with this boilerplate in an elegante way for simple use cases.&lt;/p>
 &lt;h4 id="viewmodelproviderfactory">ViewModelProvider.Factory&lt;/h4>
 &lt;p>Dagger allows you to inject the &lt;a href="https://docs.oracle.com/javaee/6/api/javax/inject/Provider.html">Provider&lt;/a> of any type available on the dependency graph and this provider can be easily mapped to ViewModelProvider.Factory.&lt;/p>
@@ -432,4 +426,10 @@ supportFragmentManager.fragmentFactory = fragmentFactory
 }
 &lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="conclusion">Conclusion&lt;/h4>
 &lt;p>As you can see it is easy to support the Architecture Components combining Dagger with Kotlin features. I personally prefer the composite approach where we can fully hide the implementation details from the production code - Activities and Fragments aren&amp;rsquo;t aware of the &lt;code>javax.inject.Provider&lt;/code> interface - and the &amp;ldquo;glue&amp;rdquo; code is done inside Dagger modules with @ClassKey annotation style. Therefore, the additional might be an overkill for use cases where you want only one ViewModel or Fragment and these extension functions can be very handy if you don&amp;rsquo;t care to use the Provider directly.&lt;/p>
-&lt;p>&lt;strong>Disclaimer:&lt;/strong> Note that you must connected the &lt;code>CompositeViewModelFactoryModule&lt;/code> and &lt;code>CompositeFragmentFactoryModule&lt;/code> to your Component. I propositally ommited this part to keep this tutorial short - if you need more information, check the &lt;a href="https://dagger.dev/">Dagger documentation&lt;/a>.&lt;/p></description></item></channel></rss>
+&lt;p>&lt;strong>Disclaimer:&lt;/strong> Note that you must connected the &lt;code>CompositeViewModelFactoryModule&lt;/code> and &lt;code>CompositeFragmentFactoryModule&lt;/code> to your Component. I propositally ommited this part to keep this tutorial short - if you need more information, check the &lt;a href="https://dagger.dev/">Dagger documentation&lt;/a>.&lt;/p></description></item><item><title>About</title><link>https://marcellogalhardo.dev/about/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://marcellogalhardo.dev/about/</guid><description>&lt;p>Software engineer with over 5 years of experience with Android. I am a moderator of the Android Dev BR community, the largest network of Android developers in Brazil.&lt;/p>
+&lt;h3 id="contact-me">Contact me&lt;/h3>
+&lt;ul>
+&lt;li>Email: &lt;a href="mailto:marcello.galhardo@gmail.com">marcello.galhardo@gmail.com&lt;/a>&lt;/li>
+&lt;li>Twitter: &lt;a href="https://twitter.com/marcellogalhard">@marcellogalhard&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://www.linkedin.com/in/marcellogalhardo/">LinkedIn&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>
