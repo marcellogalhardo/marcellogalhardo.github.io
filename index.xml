@@ -432,4 +432,12 @@ supportFragmentManager.fragmentFactory = fragmentFactory
 &lt;li>Email: &lt;a href="mailto:marcello.galhardo@gmail.com">marcello.galhardo@gmail.com&lt;/a>&lt;/li>
 &lt;li>Twitter: &lt;a href="https://twitter.com/marcellogalhard">@marcellogalhard&lt;/a>&lt;/li>
 &lt;li>&lt;a href="https://www.linkedin.com/in/marcellogalhardo/">LinkedIn&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Talks</title><link>https://marcellogalhardo.dev/talks/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://marcellogalhardo.dev/talks/</guid><description>&lt;ul>
+&lt;li>June 05, 2019: &lt;a href="https://speakerdeck.com/marcellogalhardo/railway-oriented-programming-with-kotlin">Railway Oriented Programming with Kotlin&lt;/a>&lt;/li>
+&lt;li>April 17, 2019: &lt;a href="https://speakerdeck.com/marcellogalhardo/effective-kotlin">Effective Kotlin&lt;/a>&lt;/li>
+&lt;li>March 01, 2019: &lt;a href="https://speakerdeck.com/marcellogalhardo/modularizing-legacy-apps">Modularizing Legacy Apps&lt;/a>&lt;/li>
+&lt;li>November 11, 2018: &lt;a href="https://speakerdeck.com/marcellogalhardo/android-modular-architecture">Android Modular Architecture&lt;/a>&lt;/li>
+&lt;li>January 24, 2017: &lt;a href="https://speakerdeck.com/marcellogalhardo/introduction-to-dagger-2">Introduction to Dagger 2&lt;/a>&lt;/li>
+&lt;li>January 24, 2017: &lt;a href="https://speakerdeck.com/marcellogalhardo/introducao-ao-dagger-2">Introdução ao Dagger 2 (PT-BR)&lt;/a>&lt;/li>
+&lt;li>September 06, 2016: &lt;a href="https://speakerdeck.com/marcellogalhardo/solid-no-desenvolvimento-android">SOLID no Android 2 (PT-BR)&lt;/a>&lt;/li>
 &lt;/ul></description></item></channel></rss>
