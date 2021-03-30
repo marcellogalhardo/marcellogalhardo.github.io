@@ -336,14 +336,16 @@ Wrapping an instance If you intend to get a given instance and adapt to one diff
 <p>As you can see, the Kotlin Standard library can be a good source of inspiration when designing code aiming for better discoverability between Kotlin Developers. Kotlin is a consistent language, and we can use it in our favor. Why not take advantage of that?</p>
 ]]></content></item><item><title>Using Compose on Android Studio 4.1</title><link>https://marcellogalhardo.dev/posts/2021/02/30/using-compose-on-android-studio-4-1/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://marcellogalhardo.dev/posts/2021/02/30/using-compose-on-android-studio-4-1/</guid><description>Jetpack Compose hit Beta! Many teams are excited to experiment with Compose, but as you might know, since 1.0.0-alpha04, the compiler has been refactored to a new group and became incompatible with the current Android Studio (AS) 4.1 stable:
 Compose Version 1.0.0-alpha04 is only compatible with Android Studio 4.2 Canary 13 and later.
-Been forced a Beta version of AS is a bummer. Happily, Compose is a standard Kotlin Compiler Plugin, and it is pretty straightforward to apply it directly to your project: Select the module you want to use Compose.</description><content type="html"><![CDATA[<p>Jetpack Compose hit Beta! Many teams are excited to experiment with Compose, but as you might know, since <a href="https://developer.android.com/jetpack/androidx/releases/compose-compiler#compiler-1.0.0-alpha04">1.0.0-alpha04</a>, the compiler has been refactored to a new group and became incompatible with the current Android Studio (AS) 4.1 stable:</p>
+Been forced a Beta version of AS is a bummer. Happily, Compose is a standard Kotlin Compiler Plugin, and it is pretty straightforward to apply it directly to your project:</description><content type="html"><![CDATA[<p>Jetpack Compose hit Beta! Many teams are excited to experiment with Compose, but as you might know, since <a href="https://developer.android.com/jetpack/androidx/releases/compose-compiler#compiler-1.0.0-alpha04">1.0.0-alpha04</a>, the compiler has been refactored to a new group and became incompatible with the current Android Studio (AS) 4.1 stable:</p>
 <blockquote>
 <p>Compose Version <code>1.0.0-alpha04</code> is only compatible with Android Studio 4.2 Canary 13 and later.</p>
 </blockquote>
-<p>Been forced a Beta version of AS is a bummer. Happily, Compose is a standard Kotlin Compiler Plugin, and it is pretty straightforward to apply it directly to your project:
-Select the module you want to use Compose.
-Remove the default configuration from Compose docs, as we will set it up manually.
-Apply the compiler plugin and include the runtime to your module.</p>
+<p>Been forced a Beta version of AS is a bummer. Happily, Compose is a standard Kotlin Compiler Plugin, and it is pretty straightforward to apply it directly to your project:</p>
+<ol>
+<li>Select the module you want to use Compose.</li>
+<li>Remove the default configuration from Compose docs, as we will set it up manually.</li>
+<li>Apply the compiler plugin and include the runtime to your module.</li>
+</ol>
 <p>As an example, I will set up the latest Compose (<code>1.0.0-beta03</code>) with Material and ViewModel artefacts:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-groovy" data-lang="groovy">configurations <span style="color:#f92672">{</span>
     kotlinPlugin
