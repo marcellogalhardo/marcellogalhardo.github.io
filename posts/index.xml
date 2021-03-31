@@ -7,7 +7,7 @@ Been forced to use a Beta version of AS is a real bummer. There are cases in whi
 <p>Been forced to use a Beta version of AS is a real bummer. There are cases in which you want to explore Compose in a real-world application (e.g., converting a Design System to Compose) while letting developers work in parallel using the stable version 4.1 to ship production code. Happily, Compose is a standard Kotlin Compiler Plugin, and it is pretty straightforward to apply it directly to your project:</p>
 <ol>
 <li>Select the module you want to use Compose.</li>
-<li>Remove the default configuration from Compose docs, as we will set it up manually.</li>
+<li>Remove the <a href="https://developer.android.com/jetpack/compose/setup#add-compose">default configuration</a> from Compose docs, as we will set it up manually.</li>
 <li>Apply the compiler plugin and include the runtime to your module.</li>
 </ol>
 <p>As an example, let&rsquo;s configure Gradle with the latest Compose (<code>1.0.0-beta03</code>):</p>
@@ -46,7 +46,7 @@ tasks<span style="color:#f92672">.</span><span style="color:#a6e22e">withType</s
     doFirst <span style="color:#f92672">{</span>
        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(!</span>pluginConfiguration<span style="color:#f92672">.</span><span style="color:#a6e22e">isEmpty</span><span style="color:#f92672">())</span> <span style="color:#f92672">{</span>
             <span style="color:#66d9ef">def</span> composePlugin <span style="color:#f92672">=</span> pluginConfiguration<span style="color:#f92672">.</span><span style="color:#a6e22e">files</span><span style="color:#f92672">.</span><span style="color:#a6e22e">find</span> <span style="color:#f92672">{</span> File file <span style="color:#f92672">-&gt;</span>
-                file<span style="color:#f92672">.</span><span style="color:#a6e22e">path</span><span style="color:#f92672">.</span><span style="color:#a6e22e">contains</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/androidx.compose.compiler/compiler/${composePlugin}/&#34;</span><span style="color:#f92672">)</span>
+                file<span style="color:#f92672">.</span><span style="color:#a6e22e">path</span><span style="color:#f92672">.</span><span style="color:#a6e22e">contains</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/androidx.compose.compiler/compiler/${composeVersion}/&#34;</span><span style="color:#f92672">)</span>
             <span style="color:#f92672">}</span>
             <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>composePlugin <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
                 kotlinOptions<span style="color:#f92672">.</span><span style="color:#a6e22e">freeCompilerArgs</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;-Xplugin=${composePlugin}&#34;</span>
@@ -54,7 +54,7 @@ tasks<span style="color:#f92672">.</span><span style="color:#a6e22e">withType</s
         <span style="color:#f92672">}</span>
     <span style="color:#f92672">}</span>
 <span style="color:#f92672">}</span>
-</code></pre></div><p>Now you can <a href="https://developer.android.com/jetpack/compose/setup?authuser=1">add Jetpack Compose toolkit dependencies</a> as established in the official docs:</p>
+</code></pre></div><p>Now you can <a href="https://developer.android.com/jetpack/compose/setup#compose-compiler">add Jetpack Compose toolkit dependencies</a> as established in the official docs:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-groovy" data-lang="groovy">dependencies <span style="color:#f92672">{</span>
     implementation <span style="color:#e6db74">&#34;androidx.compose.ui:ui:${composeVersion}&#34;</span>
     <span style="color:#75715e">// Tooling support (Previews, etc.)
