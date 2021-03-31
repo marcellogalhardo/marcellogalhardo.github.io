@@ -12,7 +12,6 @@ Been forced to use a Beta version of AS is a real bummer. There are cases in whi
 </ol>
 <p>As an example, let&rsquo;s configure Gradle with the latest Compose (<code>1.0.0-beta03</code>):</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-groovy" data-lang="groovy">android <span style="color:#f92672">{</span>
-
     defaultConfig <span style="color:#f92672">{</span>
         minSdkVersion <span style="color:#ae81ff">21</span>
     <span style="color:#f92672">}</span>
@@ -57,8 +56,6 @@ tasks<span style="color:#f92672">.</span><span style="color:#a6e22e">withType</s
 <span style="color:#f92672">}</span>
 </code></pre></div><p>Now you can <a href="https://developer.android.com/jetpack/compose/setup?authuser=1">add Jetpack Compose toolkit dependencies</a> as established in the official docs:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-groovy" data-lang="groovy">dependencies <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">def</span> composeVersion <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1.0.0-beta03&#34;</span>
-
     implementation <span style="color:#e6db74">&#34;androidx.compose.ui:ui:${composeVersion}&#34;</span>
     <span style="color:#75715e">// Tooling support (Previews, etc.)
 </span><span style="color:#75715e"></span>    implementation <span style="color:#e6db74">&#34;androidx.compose.ui:ui-tooling:${composeVersion}&#34;</span>
