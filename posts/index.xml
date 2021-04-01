@@ -21,15 +21,13 @@ android <span style="color:#f92672">{</span>
 
     <span style="color:#75715e">// Set both the Java and Kotlin compilers to target Java 8.
 </span><span style="color:#75715e"></span>
-    <span style="color:#66d9ef">def</span> javaVersion <span style="color:#f92672">=</span> JavaVersion<span style="color:#f92672">.</span><span style="color:#a6e22e">VERSION_1_8</span>
-
     compileOptions <span style="color:#f92672">{</span>
-        sourceCompatibility javaVersion
-        targetCompatibility javaVersion
+        sourceCompatibility JavaVersion<span style="color:#f92672">.</span><span style="color:#a6e22e">VERSION_1_8</span>
+        targetCompatibility JavaVersion<span style="color:#f92672">.</span><span style="color:#a6e22e">VERSION_1_8</span>
     <span style="color:#f92672">}</span>
 
     kotlinOptions <span style="color:#f92672">{</span>
-        jvmTarget <span style="color:#f92672">=</span> javaVersion<span style="color:#f92672">.</span><span style="color:#a6e22e">toString</span><span style="color:#f92672">()</span>
+        jvmTarget <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1.8&#34;</span>
         useIR <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
     <span style="color:#f92672">}</span>
 <span style="color:#f92672">}</span>
