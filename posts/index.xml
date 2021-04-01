@@ -10,7 +10,7 @@ Been forced to use a Beta version of AS is a real bummer. There are cases in whi
 <li>Remove the <a href="https://developer.android.com/jetpack/compose/setup#add-compose">default configuration</a> from Compose docs, as we will set it up manually.</li>
 <li>Apply the compiler plugin and include the runtime to your module.</li>
 </ol>
-<p><strong>Heads-up</strong>: the following code snippets assume you are using Groovy, but you can also do it with KTS. For more details, see <a href="#Gradle-KTS-Differences">Gradle KTS Differences</a>.</p>
+<p><strong>Heads-up</strong>: the following code snippets assume you are using Groovy, but you can also do it with KTS. For more details, see <a href="#gradle-kts-differences">Gradle KTS Differences</a>.</p>
 <p>As an example, let&rsquo;s configure Gradle with the latest Compose (<code>1.0.0-beta03</code>):</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-groovy" data-lang="groovy"><span style="color:#f92672">import</span> org.jetbrains.kotlin.gradle.plugin.KotlinPluginKt
 
@@ -65,7 +65,7 @@ dependencies <span style="color:#f92672">{</span>
 </span><span style="color:#75715e"></span>    androidTestImplementation <span style="color:#e6db74">&#34;androidx.compose.ui:ui-test-junit4:${composeVersion}&#34;</span>
 <span style="color:#f92672">}</span>
 </code></pre></div><p>Once it is in place, you can build Compose Apps in your AS 4.1 stable. Note that you will not be able to use the basic IDE tooling (e.g., Preview) without opening your project in a higher version of Android Studio. Nevertheless, if you do not upgrade Android Gradle Plugin, this set-up enables you to switch between AS 4.1 and Arctic Fox and build the project with success. Keep in mind you should remove those manual configurations once you migrate to AS 4.2 or later.</p>
-<h1 id="gradle-kts-differences">Gradle KTS Differences</h1>
+<h2 id="gradle-kts-differences">Gradle KTS Differences</h2>
 <p>As pointed out by <a href="https://twitter.com/joreilly?s=20">John O.Reilly</a>, if you use <code>gradle.kts</code> the <code>KotlinPluginKt</code> import will fail, and instead, you must import directly <code>PLUGIN_CLASSPATH_CONFIGURATION_NAME</code> as following:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-kotlin" data-lang="kotlin"><span style="color:#66d9ef">import</span> org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
 
