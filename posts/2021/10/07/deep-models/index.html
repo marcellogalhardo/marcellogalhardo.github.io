@@ -1,68 +1,89 @@
-<!doctype html><html lang=en-us>
-<head>
-<meta charset=utf-8>
+<!doctype html><html lang=en dir=auto>
+<head><meta charset=utf-8>
 <meta http-equiv=x-ua-compatible content="IE=edge">
 <meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no">
-<title>Deep Models - Marcello</title>
+<meta name=robots content="index, follow">
+<title>Deep Models | Marcello</title>
+<meta name=keywords content="kotlin">
 <meta name=description content="Modeling is a critical task in Software Development: good models reduce the risk of bugs, increase readability and improve maintainability. However, I often see developers focusing on &ldquo;How can I code this?&rdquo; - and they are done when they find a way to code it. That inherently reduces the domain modeling to the abuse of primitives and shallow design where any inconsistent state is allowed.
 To better explain, let&rsquo;s consider the hypothetical requirements:">
 <meta name=author content>
-<link rel="preload stylesheet" as=style href=https://marcellogalhardo.dev/app.min.css>
-<link rel="preload stylesheet" as=style href=https://marcellogalhardo.dev/an-old-hope.min.css>
-<script defer src=https://marcellogalhardo.dev/highlight.min.js onload=hljs.initHighlightingOnLoad()></script>
-<link rel=preload as=image href=https://marcellogalhardo.dev/theme.png>
-<link rel=preload as=image href=https://marcellogalhardo.dev/twitter.svg>
-<link rel=preload as=image href=https://marcellogalhardo.dev/github.svg>
+<link rel=canonical href=https://marcellogalhardo.dev/posts/2021/10/07/deep-models/>
+<link crossorigin=anonymous href=/assets/css/stylesheet.min.5e2b4101351c21e906f398ae96901791830f58d430f96f2659dab7eaef7b3cb7.css integrity="sha256-XitBATUcIekG85iulpAXkYMPWNQw+W8mWdq36u97PLc=" rel="preload stylesheet" as=style>
+<script defer crossorigin=anonymous src=/assets/js/highlight.min.7680afc38aa6b15ddf158a4f3780b7b1f7dde7e91d26f073e6229bb7a0793c92.js integrity="sha256-doCvw4qmsV3fFYpPN4C3sffd5+kdJvBz5iKbt6B5PJI=" onload=hljs.initHighlightingOnLoad()></script>
 <link rel=icon href=https://marcellogalhardo.dev/favicon.ico>
+<link rel=icon type=image/png sizes=16x16 href=https://marcellogalhardo.dev/favicon-16x16.png>
+<link rel=icon type=image/png sizes=32x32 href=https://marcellogalhardo.dev/favicon-32x32.png>
 <link rel=apple-touch-icon href=https://marcellogalhardo.dev/apple-touch-icon.png>
+<link rel=mask-icon href=https://marcellogalhardo.dev/safari-pinned-tab.svg>
+<meta name=theme-color content="#2e2e33">
+<meta name=msapplication-TileColor content="#2e2e33">
 <meta name=generator content="Hugo 0.88.1">
-<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','G-7LK7ENB813','auto'),ga('send','pageview'))</script>
-<script async src=https://www.google-analytics.com/analytics.js></script>
+<noscript>
+<style>#theme-toggle,.top-link{display:none}</style>
+<style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--hljs-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style>
+</noscript>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7LK7ENB813"></script>
+<script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-7LK7ENB813',{anonymize_ip:!1})}</script>
 <meta property="og:title" content="Deep Models">
 <meta property="og:description" content="Modeling is a critical task in Software Development: good models reduce the risk of bugs, increase readability and improve maintainability. However, I often see developers focusing on &ldquo;How can I code this?&rdquo; - and they are done when they find a way to code it. That inherently reduces the domain modeling to the abuse of primitives and shallow design where any inconsistent state is allowed.
 To better explain, let&rsquo;s consider the hypothetical requirements:">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://marcellogalhardo.dev/posts/2021/10/07/deep-models/"><meta property="og:image" content="https://marcellogalhardo.dev/"><meta property="article:section" content="posts">
+<meta property="og:url" content="https://marcellogalhardo.dev/posts/2021/10/07/deep-models/"><meta property="article:section" content="posts">
 <meta property="article:published_time" content="2021-10-07T09:02:50+01:00">
 <meta property="article:modified_time" content="2021-10-07T09:02:50+01:00"><meta property="og:site_name" content="Marcello">
-<meta itemprop=name content="Deep Models">
-<meta itemprop=description content="Modeling is a critical task in Software Development: good models reduce the risk of bugs, increase readability and improve maintainability. However, I often see developers focusing on &ldquo;How can I code this?&rdquo; - and they are done when they find a way to code it. That inherently reduces the domain modeling to the abuse of primitives and shallow design where any inconsistent state is allowed.
-To better explain, let&rsquo;s consider the hypothetical requirements:"><meta itemprop=datePublished content="2021-10-07T09:02:50+01:00">
-<meta itemprop=dateModified content="2021-10-07T09:02:50+01:00">
-<meta itemprop=wordCount content="769"><meta itemprop=image content="https://marcellogalhardo.dev/">
-<meta itemprop=keywords content="kotlin,">
-<meta name=twitter:card content="summary_large_image">
-<meta name=twitter:image content="https://marcellogalhardo.dev/">
+<meta name=twitter:card content="summary">
 <meta name=twitter:title content="Deep Models">
 <meta name=twitter:description content="Modeling is a critical task in Software Development: good models reduce the risk of bugs, increase readability and improve maintainability. However, I often see developers focusing on &ldquo;How can I code this?&rdquo; - and they are done when they find a way to code it. That inherently reduces the domain modeling to the abuse of primitives and shallow design where any inconsistent state is allowed.
 To better explain, let&rsquo;s consider the hypothetical requirements:">
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"https://marcellogalhardo.dev/posts/"},{"@type":"ListItem","position":2,"name":"Deep Models","item":"https://marcellogalhardo.dev/posts/2021/10/07/deep-models/"}]}</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Deep Models","name":"Deep Models","description":"Modeling is a critical task in Software Development: good models reduce the risk of bugs, increase readability and improve maintainability. However, I often see developers focusing on \u0026ldquo;How can I code this?\u0026rdquo; - and they are done when they find a way to code it. That inherently reduces the domain modeling to the abuse of primitives and shallow design where any inconsistent state is allowed.\nTo better explain, let\u0026rsquo;s consider the hypothetical requirements:","keywords":["kotlin"],"articleBody":"Modeling is a critical task in Software Development: good models reduce the risk of bugs, increase readability and improve maintainability. However, I often see developers focusing on “How can I code this?” - and they are done when they find a way to code it. That inherently reduces the domain modeling to the abuse of primitives and shallow design where any inconsistent state is allowed.\nTo better explain, let’s consider the hypothetical requirements:\n Your team is developing a feature to order items in e-commerce. Your job is to design the models of this feature.  The simplest way to do that might look like the code below.\nfun findOrderById(id: String): Order data class Order( val id: String, val accountId: String, val items: List, // ...billing address, shipping address, status, and other properties. ) data class OrderItem( val id: String, val name: String, val quantity: Int, val price: BigDecimal, ) At first glance, these models will look good, but let’s have a closer look.\n Primitive Obsession: almost all types are String, and the compiler is incapable of verifying their integrity. Absence of Invariants: it is unrealistic to define a quantity as a number between -2147483648 and 2147483647. Error Prone: what happens if you create an Order with an empty accountId? What will happen if you call findOrderById with an ItemId by mistake?  Good models get out of developers' way by making it impossible to be in an invalid state and by leveraging the compiler not to allow human’s mistake (e.g., an OrderItemId should not be used as an OrderId).\nLet’s redesign the previous model.\nfun findOrderById(id: OrderId): Order data class Order( val id: OrderId, val accountId: OrderAccountId, val items: List, ) @JvmInline value class OrderId(val value: String) { init { runCatching { UUID.fromString(value) } .onFailure { e - error(\"OrderId should be a valid UUID but found: $value.\") } } } @JvmInline value class AccountId(val value: String) { init { runCatching { UUID.fromString(value) } .onFailure { e - error(\"AccountId should be a valid UUID but found: $value.\") } } } data class OrderItem( val id: OrderItemId, val name: OrderItemName, val quantity: OrderItemQuantity, val price: OrderItemPrice, ) @JvmInline value class OrderItemId(val value: String) { init { runCatching { UUID.fromString(value) } .onFailure { e - error(\"OrderItemId should be a valid UUID but found: $value.\") } } } @JvmInline value class OrderItemName(val value: String) { init { require(value.isNotBlank()) { \"OrderItemName should not be blank.\" } require(value.length 200) { \"OrderItemName length should be smaller than 200 but found: ${value.length}with content: $value.\"} } } @JvmInline value class OrderItemQuantity(val value: Int) { init { require(value 0) { \"OrderItemQuantity should not be negative but found: $value.\" } require(value  99) { \"OrderItemQuantity should not be higher than 99 but found: $value.\" } } } @JvmInline value class OrderItemPrice(val value: BigDecimal) { init { require(value 0) { \"OrderItemPrice should not be negative but found: $value.\" } } } The new API makes it impossible to create an invalid instance of an Order. It ensures all invariants of an Order are respected during the application’s lifetime and reduces corner cases by providing a type-safe API: the function findOrderById knows that you are calling it with an OrderId, it will be a valid UUID.\nF.A.Q.  What about the number of classes?  Good models often will involve more classes and specific validations - but keep in mind those are already in our code. Remember all those checks to verify if the parameter of findOrderById is valid? Or that InvalidArgumentException when the expected quantity but received a negative number? Now they are explicitly defined in our domain and can be easily found.\nWhat about the number of lines of code?  It is true that now you need to cover more ground, but it is also true that you reduced the number of corner cases. Before, your tests had to cover if the findOrderByid parameter is valid. Now, the compiler will ensure the parameter is always correct - if the code compiles, you know you are receiving a correct UUID. In the end, you are making safer code and reducing the number of tests you will need.\nShould I have a class for each property?  Probably not. Modeling requires a lot of analysis. You must identify the essential concepts of your domain that must be assertive and ensure those are deep. For that, Domain-Driven Design might help you.\nCredits Special credits for Secure By Design (Chapter 2: Shallow Modeling) and A Philosophy of Software Design (Chapter 4: Modules should be deep) where I learnt about Deep and Shallow modeling, both exceptional books.\nIf you like my posts, follow me on Twitter: @marcellogalhard\n","wordCount":"769","inLanguage":"en","datePublished":"2021-10-07T09:02:50+01:00","dateModified":"2021-10-07T09:02:50+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://marcellogalhardo.dev/posts/2021/10/07/deep-models/"},"publisher":{"@type":"Organization","name":"Marcello","logo":{"@type":"ImageObject","url":"https://marcellogalhardo.dev/favicon.ico"}}}</script>
 </head>
-<body class=not-ready data-menu=true>
+<body id=top>
+<script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add('dark'):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove('dark'):window.matchMedia('(prefers-color-scheme: dark)').matches&&document.body.classList.add('dark')</script>
 <header class=header>
-<p class=logo>
-<a class=site-name href=https://marcellogalhardo.dev/>Marcello</a><a class=btn-dark></a>
-</p>
-<script>let bodyClx=document.body.classList,btnDark=document.querySelector('.btn-dark'),sysDark=window.matchMedia('(prefers-color-scheme: dark)'),darkVal=localStorage.getItem('dark'),setDark=a=>{bodyClx[a?'add':'remove']('dark'),localStorage.setItem('dark',a?'yes':'no')};setDark(darkVal?darkVal==='yes':sysDark.matches),requestAnimationFrame(()=>bodyClx.remove('not-ready')),btnDark.addEventListener('click',()=>setDark(!bodyClx.contains('dark'))),sysDark.addEventListener('change',a=>setDark(a.matches))</script>
-<nav class=menu>
-<a href=/posts/>Posts</a>
-<a href=/talks>Talks</a>
-<a href=/about>About</a>
-<a href=/uses>Uses</a>
-</nav>
-<nav class=social>
-<a class=twitter style=--url:url(./twitter.svg) href=https://twitter.com/https://twitter.com/marcellogalhard target=_blank></a>
-<a class=github style=--url:url(./github.svg) href=https://github.com/https://github.com/marcellogalhardo target=_blank></a>
+<nav class=nav>
+<div class=logo>
+<a href=https://marcellogalhardo.dev/ accesskey=h title="Marcello (Alt + H)">Marcello</a>
+<span class=logo-switches>
+<button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</button>
+</span>
+</div>
+<ul id=menu>
+<li>
+<a href=https://marcellogalhardo.dev/posts/ title=Posts>
+<span>Posts</span>
+</a>
+</li>
+<li>
+<a href=https://marcellogalhardo.dev/talks title=Talks>
+<span>Talks</span>
+</a>
+</li>
+<li>
+<a href=https://marcellogalhardo.dev/about title=About>
+<span>About</span>
+</a>
+</li>
+<li>
+<a href=https://marcellogalhardo.dev/uses title=Uses>
+<span>Uses</span>
+</a>
+</li>
+</ul>
 </nav>
 </header>
 <main class=main>
 <article class=post-single>
-<header class=post-title>
-<p>
-<time>Oct 7, 2021</time>
-</p>
-<h1>Deep Models</h1>
+<header class=post-header>
+<h1 class=post-title>
+Deep Models
+</h1>
+<div class=post-meta>October 7, 2021
+</div>
 </header>
-<section class=post-content><p>Modeling is a critical task in Software Development: good models reduce the risk of bugs, increase readability and improve maintainability. However, I often see developers focusing on &ldquo;How can I code this?&rdquo; - and they are done when they find a way to code it. That inherently reduces the domain modeling to the abuse of primitives and shallow design where any inconsistent state is allowed.</p>
+<div class=post-content><p>Modeling is a critical task in Software Development: good models reduce the risk of bugs, increase readability and improve maintainability. However, I often see developers focusing on &ldquo;How can I code this?&rdquo; - and they are done when they find a way to code it. That inherently reduces the domain modeling to the abuse of primitives and shallow design where any inconsistent state is allowed.</p>
 <p>To better explain, let&rsquo;s consider the hypothetical requirements:</p>
 <ul>
 <li>Your team is developing a feature to order items in e-commerce.</li>
@@ -154,7 +175,7 @@ value <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>OrderItem
     }
 }
 </code></pre></div><p>The new API makes it impossible to create an invalid instance of an <code>Order</code>. It ensures all invariants of an <code>Order</code> are respected during the application&rsquo;s lifetime and reduces corner cases by providing a type-safe API: the function <code>findOrderById</code> knows that you are calling it with an <code>OrderId</code>, it will be a valid <code>UUID</code>.</p>
-<h2 id=faq>F.A.Q.</h2>
+<h2 id=faq>F.A.Q.<a hidden class=anchor aria-hidden=true href=#faq>#</a></h2>
 <ol>
 <li>What about the number of classes?</li>
 </ol>
@@ -167,16 +188,15 @@ value <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>OrderItem
 <li>Should I have a class for each property?</li>
 </ol>
 <p>Probably not. Modeling requires a lot of analysis. You must identify the essential concepts of your domain that must be assertive and ensure those are deep. For that, <a href=https://martinfowler.com/bliki/DomainDrivenDesign.html>Domain-Driven Design</a> might help you.</p>
-<h1 id=credits>Credits</h1>
+<h1 id=credits>Credits<a hidden class=anchor aria-hidden=true href=#credits>#</a></h1>
 <p>Special credits for <a href=https://www.manning.com/books/secure-by-design>Secure By Design</a> (Chapter 2: Shallow Modeling) and <a href=https://www.amazon.de/-/en/John-Ousterhout/dp/1732102201>A Philosophy of Software Design</a> (Chapter 4: Modules should be deep) where I learnt about Deep and Shallow modeling, both exceptional books.</p>
 <p>If you like my posts, follow me on Twitter: <a href=https://twitter.com/marcellogalhard>@marcellogalhard</a></p>
-</section>
-<footer class=post-tags>
-<a href=https://marcellogalhardo.dev/tags/kotlin>kotlin</a>
+</div>
+<footer class=post-footer>
+<ul class=post-tags>
+<li><a href=https://marcellogalhardo.dev/tags/kotlin/>kotlin</a></li>
+</ul>
 </footer>
-<nav class=post-nav>
-<a class=next href=https://marcellogalhardo.dev/posts/2021/03/30/using-compose-beta-on-as-4-1/><span>Using Compose Beta on AS 4.1</span><span>→</span></a>
-</nav>
 </article>
 </main>
 <footer class=footer>
