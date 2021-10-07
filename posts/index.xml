@@ -1,4 +1,113 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Marcello</title><link>https://marcellogalhardo.dev/posts/</link><description>Recent content in Posts on Marcello</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>&lt;a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0&lt;/a></copyright><lastBuildDate>Tue, 30 Mar 2021 17:37:41 +0200</lastBuildDate><atom:link href="https://marcellogalhardo.dev/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>Using Compose Beta on AS 4.1</title><link>https://marcellogalhardo.dev/posts/2021/03/30/using-compose-beta-on-as-4-1/</link><pubDate>Tue, 30 Mar 2021 17:37:41 +0200</pubDate><guid>https://marcellogalhardo.dev/posts/2021/03/30/using-compose-beta-on-as-4-1/</guid><description>Jetpack Compose hit Beta! Many teams are excited to experiment with Compose, but as you might know, since 1.0.0-alpha04, the compiler has been refactored to a new group and became incompatible with the current Android Studio (AS) 4.1 stable:
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Marcello</title><link>https://marcellogalhardo.dev/posts/</link><description>Recent content in Posts on Marcello</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>&lt;a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0&lt;/a></copyright><lastBuildDate>Thu, 07 Oct 2021 09:02:50 +0100</lastBuildDate><atom:link href="https://marcellogalhardo.dev/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>Deep Models</title><link>https://marcellogalhardo.dev/posts/2021/10/07/deep-models/</link><pubDate>Thu, 07 Oct 2021 09:02:50 +0100</pubDate><guid>https://marcellogalhardo.dev/posts/2021/10/07/deep-models/</guid><description>Modeling is a critical task in Software Development: good models reduce the risk of bugs, increase readability and improve maintainability. However, I often see developers focusing on &amp;ldquo;How can I code this?&amp;rdquo; - and they are done when they find a way to code it. That inherently reduces the domain modeling to the abuse of primitives and shallow design where any inconsistent state is allowed.
+To better explain, let&amp;rsquo;s consider the hypothetical requirements:</description><content type="html"><![CDATA[<p>Modeling is a critical task in Software Development: good models reduce the risk of bugs, increase readability and improve maintainability. However, I often see developers focusing on &ldquo;How can I code this?&rdquo; - and they are done when they find a way to code it. That inherently reduces the domain modeling to the abuse of primitives and shallow design where any inconsistent state is allowed.</p>
+<p>To better explain, let&rsquo;s consider the hypothetical requirements:</p>
+<ul>
+<li>Your team is developing a feature to order items in e-commerce.</li>
+<li>Your job is to design the models of this feature.</li>
+</ul>
+<p>The simplest way to do that might look like the code below.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-kotlin" data-lang="kotlin"><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">findOrderById</span>(id: String): Order
+
+<span style="color:#66d9ef">data</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Order</span>(
+    <span style="color:#66d9ef">val</span> id: String,
+    <span style="color:#66d9ef">val</span> accountId: String,
+    <span style="color:#66d9ef">val</span> items: List&lt;OrderItem&gt;,
+    <span style="color:#75715e">// ...billing address, shipping address, status, and other properties.
+</span><span style="color:#75715e"></span>)
+
+<span style="color:#66d9ef">data</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">OrderItem</span>(
+    <span style="color:#66d9ef">val</span> id: String,
+    <span style="color:#66d9ef">val</span> name: String,
+    <span style="color:#66d9ef">val</span> quantity: Int,
+    <span style="color:#66d9ef">val</span> price: BigDecimal,
+)
+</code></pre></div><p>At first glance, these models will look good, but let&rsquo;s have a closer look.</p>
+<ol>
+<li><a href="https://refactoring.guru/smells/primitive-obsession">Primitive Obsession</a>: almost all types are String, and the compiler is incapable of verifying their integrity.</li>
+<li><a href="https://medium.com/code-design/invariants-in-code-design-557c7864a047">Absence of Invariants</a>: it is unrealistic to define a quantity as a number between <code>-2147483648</code> and <code>2147483647</code>.</li>
+<li><a href="https://www.youtube.com/watch?v=t3DBzaeid74">Error Prone</a>: what happens if you create an <code>Order</code> with an empty <code>accountId</code>? What will happen if you call <code>findOrderById</code> with an <code>ItemId</code> by mistake?</li>
+</ol>
+<p>Good models get out of developers' way by making it impossible to be in an invalid state and by leveraging the compiler not to allow human&rsquo;s mistake (e.g., an <code>OrderItemId</code> should not be used as an <code>OrderId</code>).</p>
+<p>Let&rsquo;s redesign the previous model.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-kotlin" data-lang="kotlin"><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">findOrderById</span>(id: OrderId): Order
+
+<span style="color:#66d9ef">data</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Order</span>(
+    <span style="color:#66d9ef">val</span> id: OrderId,
+    <span style="color:#66d9ef">val</span> accountId: OrderAccountId,
+    <span style="color:#66d9ef">val</span> items: List&lt;OrderItem&gt;,
+)
+
+<span style="color:#a6e22e">@JvmInline</span>
+value <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">OrderId</span>(<span style="color:#66d9ef">val</span> value: String) {
+    <span style="color:#66d9ef">init</span> {
+        runCatching { UUID.fromString(value) }
+            .onFailure { e <span style="color:#f92672">-&gt;</span> error(<span style="color:#e6db74">&#34;OrderId should be a valid UUID but found: </span><span style="color:#e6db74">$value</span><span style="color:#e6db74">.&#34;</span>) }
+    }
+}
+
+<span style="color:#a6e22e">@JvmInline</span>
+value <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AccountId</span>(<span style="color:#66d9ef">val</span> value: String) {
+    <span style="color:#66d9ef">init</span> {
+        runCatching { UUID.fromString(value) }
+            .onFailure { e <span style="color:#f92672">-&gt;</span> error(<span style="color:#e6db74">&#34;AccountId should be a valid UUID but found: </span><span style="color:#e6db74">$value</span><span style="color:#e6db74">.&#34;</span>) }
+    }
+}
+
+<span style="color:#66d9ef">data</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">OrderItem</span>(
+    <span style="color:#66d9ef">val</span> id: OrderItemId,
+    <span style="color:#66d9ef">val</span> name: OrderItemName,
+    <span style="color:#66d9ef">val</span> quantity: OrderItemQuantity,
+    <span style="color:#66d9ef">val</span> price: OrderItemPrice,
+)
+
+<span style="color:#a6e22e">@JvmInline</span>
+value <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">OrderItemId</span>(<span style="color:#66d9ef">val</span> value: String) {
+    <span style="color:#66d9ef">init</span> {
+        runCatching { UUID.fromString(value) }
+            .onFailure { e <span style="color:#f92672">-&gt;</span> error(<span style="color:#e6db74">&#34;OrderItemId should be a valid UUID but found: </span><span style="color:#e6db74">$value</span><span style="color:#e6db74">.&#34;</span>) }
+    }
+}
+
+<span style="color:#a6e22e">@JvmInline</span>
+value <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">OrderItemName</span>(<span style="color:#66d9ef">val</span> value: String) {
+    <span style="color:#66d9ef">init</span> {
+        require(value.isNotBlank()) { <span style="color:#e6db74">&#34;OrderItemName should not be blank.&#34;</span> }
+        require(value.length &lt; <span style="color:#ae81ff">200</span>) { <span style="color:#e6db74">&#34;OrderItemName length should be smaller than 200 but found: </span><span style="color:#e6db74">${value.length}</span><span style="color:#e6db74"> with content: </span><span style="color:#e6db74">$value</span><span style="color:#e6db74">.&#34;</span>}
+    }
+}
+
+<span style="color:#a6e22e">@JvmInline</span>
+value <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">OrderItemQuantity</span>(<span style="color:#66d9ef">val</span> value: Int) {
+    <span style="color:#66d9ef">init</span> {
+        require(value &lt; <span style="color:#ae81ff">0</span>) { <span style="color:#e6db74">&#34;OrderItemQuantity should not be negative but found: </span><span style="color:#e6db74">$value</span><span style="color:#e6db74">.&#34;</span> }
+        require(value &gt; <span style="color:#ae81ff">99</span>) { <span style="color:#e6db74">&#34;OrderItemQuantity should not be higher than 99 but found: </span><span style="color:#e6db74">$value</span><span style="color:#e6db74">.&#34;</span> }
+    }
+}
+
+<span style="color:#a6e22e">@JvmInline</span>
+value <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">OrderItemPrice</span>(<span style="color:#66d9ef">val</span> value: BigDecimal) {
+    <span style="color:#66d9ef">init</span> {
+        require(value &lt; <span style="color:#ae81ff">0</span>) { <span style="color:#e6db74">&#34;OrderItemPrice should not be negative but found: </span><span style="color:#e6db74">$value</span><span style="color:#e6db74">.&#34;</span> }
+    }
+}
+</code></pre></div><p>The new API makes it impossible to create an invalid instance of an <code>Order</code>. It ensures all invariants of an <code>Order</code> are respected during the application&rsquo;s lifetime and reduces corner cases by providing a type-safe API: the function <code>findOrderById</code> knows that you are calling it with an <code>OrderId</code>, it will be a valid <code>UUID</code>.</p>
+<h2 id="faq">F.A.Q.</h2>
+<ol>
+<li>What about the number of classes?</li>
+</ol>
+<p>Good models often will involve more classes and specific validations - but keep in mind those are already in our code. Remember all those checks to verify if the parameter of <code>findOrderById</code> is valid? Or that <code>InvalidArgumentException</code> when the expected quantity but received a negative number? Now they are explicitly defined in our domain and can be easily found.</p>
+<ol start="2">
+<li>What about the number of lines of code?</li>
+</ol>
+<p>It is true that now you need to cover more ground, but it is also true that you reduced the number of corner cases. Before, your tests had to cover if the <code>findOrderByid</code> parameter is valid. Now, the compiler will ensure the parameter is always correct - if the code compiles, you know you are receiving a correct <code>UUID</code>. In the end, you are making safer code and reducing the number of tests you will need.</p>
+<ol start="3">
+<li>Should I have a class for each property?</li>
+</ol>
+<p>Probably not. Modeling requires a lot of analysis. You must identify the essential concepts of your domain that must be assertive and ensure those are deep. For that, <a href="https://martinfowler.com/bliki/DomainDrivenDesign.html">Domain-Driven Design</a> might help you.</p>
+<h1 id="credits">Credits</h1>
+<p>Special credits for <a href="https://www.manning.com/books/secure-by-design">Secure By Design</a> (Chapter 2: Shallow Modeling) and <a href="https://www.amazon.de/-/en/John-Ousterhout/dp/1732102201">A Philosophy of Software Design</a> (Chapter 4: Modules should be deep) where I learnt about Deep and Shallow modeling, both exceptional books.</p>
+<p>If you like my posts, follow me on Twitter: <a href="https://twitter.com/marcellogalhard">@marcellogalhard</a></p>
+]]></content></item><item><title>Using Compose Beta on AS 4.1</title><link>https://marcellogalhardo.dev/posts/2021/03/30/using-compose-beta-on-as-4-1/</link><pubDate>Tue, 30 Mar 2021 17:37:41 +0200</pubDate><guid>https://marcellogalhardo.dev/posts/2021/03/30/using-compose-beta-on-as-4-1/</guid><description>Jetpack Compose hit Beta! Many teams are excited to experiment with Compose, but as you might know, since 1.0.0-alpha04, the compiler has been refactored to a new group and became incompatible with the current Android Studio (AS) 4.1 stable:
 Compose Version 1.0.0-alpha04 is only compatible with Android Studio 4.2 Canary 13 and later.
 Been forced to use a Canary version of AS is a real bummer. There are cases in which you want to explore Compose in a real-world application (e.</description><content type="html"><![CDATA[<p>Jetpack Compose hit Beta! Many teams are excited to experiment with Compose, but as you might know, since <a href="https://developer.android.com/jetpack/androidx/releases/compose-compiler#compiler-1.0.0-alpha04">1.0.0-alpha04</a>, the compiler has been refactored to a new group and became incompatible with the current Android Studio (AS) 4.1 stable:</p>
 <blockquote>
