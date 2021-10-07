@@ -1,28 +1,20 @@
-<!doctype html><html lang=en-us>
+<!doctype html><html lang=en>
 <head>
 <meta charset=utf-8>
-<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta http-equiv=x-ua-compatible content="ie=edge">
 <meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no">
-<title>N26 Path to Anvil - Marcello</title>
-<meta name=description content="This post represents my personal experience while working at N26. I do not speak for the company nor by other employees.
-N26 Android App current codebase has a million lines of code, 280+ modules, and 30+ engineers working in 4 different countries and different timezones in a mono repository. Our modules are divided into features and libraries, and we have been using &ldquo;Sample Apps&rdquo; for years now as our full app build time might take up to 20 minutes.">
 <meta name=author content>
-<link rel="preload stylesheet" as=style href=https://marcellogalhardo.dev/app.min.css>
-<link rel="preload stylesheet" as=style href=https://marcellogalhardo.dev/an-old-hope.min.css>
-<script defer src=https://marcellogalhardo.dev/highlight.min.js onload=hljs.initHighlightingOnLoad()></script>
-<link rel=preload as=image href=https://marcellogalhardo.dev/theme.png>
-<link rel=icon href=https://marcellogalhardo.dev/favicon.ico>
-<link rel=apple-touch-icon href=https://marcellogalhardo.dev/apple-touch-icon.png>
-<meta name=generator content="Hugo 0.88.1">
-<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','G-7LK7ENB813','auto'),ga('send','pageview'))</script>
-<script async src=https://www.google-analytics.com/analytics.js></script>
-<meta property="og:title" content="N26 Path to Anvil">
-<meta property="og:description" content="This post represents my personal experience while working at N26. I do not speak for the company nor by other employees.
-N26 Android App current codebase has a million lines of code, 280+ modules, and 30+ engineers working in 4 different countries and different timezones in a mono repository. Our modules are divided into features and libraries, and we have been using &ldquo;Sample Apps&rdquo; for years now as our full app build time might take up to 20 minutes.">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://marcellogalhardo.dev/posts/2021/02/05/n26-path-to-anvil/"><meta property="og:image" content="https://marcellogalhardo.dev/"><meta property="article:section" content="posts">
-<meta property="article:published_time" content="2021-02-05T09:02:50+01:00">
-<meta property="article:modified_time" content="2021-02-05T09:02:50+01:00"><meta property="og:site_name" content="Marcello">
+<meta name=description content="This post represents my personal experience while working at N26. I do not speak for the company nor by other employees.
+N26 Android App current codebase has a million lines of code, 280+ modules, and 30+ engineers working in 4 different countries and different timezones in a mono repository. Our modules are divided into features and libraries, and we have been using &amp;ldquo;Sample Apps&amp;rdquo; for years now as our full app build time might take up to 20 minutes.">
+<meta name=keywords content=",android,dagger,anvil">
+<meta name=robots content="noodp">
+<meta name=theme-color content>
+<link rel=canonical href=https://marcellogalhardo.dev/posts/2021/02/05/n26-path-to-anvil/>
+<title>
+N26 Path to Anvil :: Marcello — Software Engineer (Android)
+</title>
+<link href=https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css rel=stylesheet type=text/css>
+<link rel=stylesheet href=/main.29c2c8c3fc9cf748254138351f142ac2833b208a68e83aec126edc98b59efef2.css>
 <meta itemprop=name content="N26 Path to Anvil">
 <meta itemprop=description content="This post represents my personal experience while working at N26. I do not speak for the company nor by other employees.
 N26 Android App current codebase has a million lines of code, 280+ modules, and 30+ engineers working in 4 different countries and different timezones in a mono repository. Our modules are divided into features and libraries, and we have been using &ldquo;Sample Apps&rdquo; for years now as our full app build time might take up to 20 minutes."><meta itemprop=datePublished content="2021-02-05T09:02:50+01:00">
@@ -34,29 +26,46 @@ N26 Android App current codebase has a million lines of code, 280+ modules, and 
 <meta name=twitter:title content="N26 Path to Anvil">
 <meta name=twitter:description content="This post represents my personal experience while working at N26. I do not speak for the company nor by other employees.
 N26 Android App current codebase has a million lines of code, 280+ modules, and 30+ engineers working in 4 different countries and different timezones in a mono repository. Our modules are divided into features and libraries, and we have been using &ldquo;Sample Apps&rdquo; for years now as our full app build time might take up to 20 minutes.">
+<meta property="article:section" content="software development">
+<meta property="article:published_time" content="2021-02-05 09:02:50 +0100 +0100">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7LK7ENB813"></script>
+<script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-7LK7ENB813',{anonymize_ip:!1})}</script>
 </head>
-<body class=not-ready data-menu=true>
+<body>
+<div class=container>
 <header class=header>
-<p class=logo>
-<a class=site-name href=https://marcellogalhardo.dev/>Marcello</a><a class=btn-dark></a>
-</p>
-<script>let bodyClx=document.body.classList,btnDark=document.querySelector('.btn-dark'),sysDark=window.matchMedia('(prefers-color-scheme: dark)'),darkVal=localStorage.getItem('dark'),setDark=a=>{bodyClx[a?'add':'remove']('dark'),localStorage.setItem('dark',a?'yes':'no')};setDark(darkVal?darkVal==='yes':sysDark.matches),requestAnimationFrame(()=>bodyClx.remove('not-ready')),btnDark.addEventListener('click',()=>setDark(!bodyClx.contains('dark'))),sysDark.addEventListener('change',a=>setDark(a.matches))</script>
+<span class=header__inner>
+<a href=/ style=text-decoration:none>
+<div class=logo>
+<span class=logo__mark>></span>
+<span class=logo__text>marcellogalhardo.dev</span>
+<span class=logo__cursor>
+</span>
+</div>
+</a>
+<span class=header__right>
 <nav class=menu>
-<a href=/posts/>Posts</a>
-<a href=/talks>Talks</a>
-<a href=/about>About</a>
-<a href=/uses>Uses</a>
+<ul class=menu__inner><li><a href=/posts/>Posts</a></li><li><a href=/talks>Talks</a></li><li><a href=/about>About</a></li><li><a href=/uses>Uses</a></li>
+</ul>
 </nav>
+<span class=menu-trigger><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+</span>
+</span>
+</span>
 </header>
-<main class=main>
-<article class=post-single>
-<header class=post-title>
-<p>
-<time>Feb 5, 2021</time>
+<div class=content>
+<main class=post>
+<div class=post-info>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+6 minutes
 </p>
-<h1>N26 Path to Anvil</h1>
-</header>
-<section class=post-content><p>This post represents my personal experience while working at N26. I do not speak for the company nor by other employees.</p>
+</div>
+<article>
+<h1 class=post-title>
+<a href=https://marcellogalhardo.dev/posts/2021/02/05/n26-path-to-anvil/>N26 Path to Anvil</a>
+</h1>
+<div class=post-content>
+<p>This post represents my personal experience while working at N26. I do not speak for the company nor by other employees.</p>
 <p>N26 Android App current codebase has a million lines of code, 280+ modules, and 30+ engineers working in 4 different countries and different timezones in a mono repository. Our modules are divided into features and libraries, and we have been using &ldquo;<a href=https://cashapp.github.io/2020-08-25/attacking-build-times-with-sample-apps>Sample Apps</a>&rdquo; for years now as our full app build time might take up to 20 minutes.</p>
 <p>Today I will share a little about my story with Dagger inside the company, why we adopt Anvil, some of the challenges we faced, and how are the results so far.</p>
 <h1 id=dagger-oh-my>Dagger, (oh, my)</h1>
@@ -132,18 +141,47 @@ N26 Android App current codebase has a million lines of code, 280+ modules, and 
 <p>Thanks to <a href=https://twitter.com/maryte_chietera>Maria Chietera</a>, <a href=https://twitter.com/orafaaraujo>Rafael Araujo</a>, <a href=https://twitter.com/laggedHero>Tiago Cunha</a>, <a href=https://twitter.com/fabiocarballo>Fabio Carballo</a>, and <a href=https://twitter.com/s_anastasov>Stojan Anastasov</a> proofread review! 🔍</p>
 <p>And a special thank you to <a href=https://twitter.com/vRallev>Ralf Wondratschek</a> for early feedback and creating Anvil! :knife:</p>
 <p>If you like my posts, follow me on Twitter: <a href=https://twitter.com/marcellogalhard>@marcellogalhard</a></p>
-</section>
-<footer class=post-tags>
-<a href=https://marcellogalhardo.dev/tags/android>android</a>
-<a href=https://marcellogalhardo.dev/tags/dagger>dagger</a>
-<a href=https://marcellogalhardo.dev/tags/anvil>anvil</a>
-</footer>
-<nav class=post-nav>
-<a class=prev href=https://marcellogalhardo.dev/posts/2021/03/30/using-compose-beta-on-as-4-1/><span>←</span><span>Using Compose Beta on AS 4.1</span></a>
-<a class=next href=https://marcellogalhardo.dev/posts/2021/02/01/humble-views-proud-viewmodels/><span>Humble Views, Proud ViewModels</span><span>→</span></a>
-</nav>
+</div>
 </article>
+<hr>
+<div class=post-info>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83.0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7" y2="7"/></svg>
+<span class=tag><a href=https://marcellogalhardo.dev/tags/android/>android</a></span>
+<span class=tag><a href=https://marcellogalhardo.dev/tags/dagger/>dagger</a></span>
+<span class=tag><a href=https://marcellogalhardo.dev/tags/anvil/>anvil</a></span>
+</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-folder meta-icon"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+<span class=tag><a href=https://marcellogalhardo.dev/categories/software-development/>software development</a></span>
+</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+1128 Words
+</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+2021-02-05 08:02
+</p>
+</div>
+<div class=pagination>
+<div class=pagination__title>
+<span class=pagination__title-h>Read other posts</span>
+<hr>
+</div>
+<div class=pagination__buttons>
+<span class="button previous">
+<a href=https://marcellogalhardo.dev/posts/2021/03/30/using-compose-beta-on-as-4-1/>
+<span class=button__icon>←</span>
+<span class=button__text>Using Compose Beta on AS 4.1</span>
+</a>
+</span>
+<span class="button next">
+<a href=https://marcellogalhardo.dev/posts/2021/02/01/humble-views-proud-viewmodels/>
+<span class=button__text>Humble Views, Proud ViewModels</span>
+<span class=button__icon>→</span>
+</a>
+</span>
+</div>
+</div>
 </main>
+</div>
 <footer class=footer>
 <div class=footer__inner>
 <div class=footer__content>
@@ -152,5 +190,7 @@ N26 Android App current codebase has a million lines of code, 280+ modules, and 
 </div>
 </div>
 </footer>
+</div>
+<script type=text/javascript src=/bundle.min.599099f1f14b78b657d524b28e10e0c5098e7cd46e9c7aed73d577068a276c3ff1bb234cbf29cb313333e83cf411727b43157c91ce5b809e2ffc81664614608e.js integrity="sha512-WZCZ8fFLeLZX1SSyjhDgxQmOfNRunHrtc9V3BoonbD/xuyNMvynLMTMz6Dz0EXJ7QxV8kc5bgJ4v/IFmRhRgjg=="></script>
 </body>
 </html>
