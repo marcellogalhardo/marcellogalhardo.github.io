@@ -1,293 +1,163 @@
-<!doctype html><html lang=en dir=auto>
-<head><meta charset=utf-8>
-<meta http-equiv=x-ua-compatible content="IE=edge">
-<meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no">
-<meta name=robots content="index, follow">
-<title>Humble Views, Proud ViewModels | Marcello Galhardo</title>
-<meta name=keywords content="android,kotlin">
-<meta name=description content="The Android Community has long advocated that Activities and Fragments were views - but this perception has changed over time. For good. Let&rsquo;s dive deep into how to design views and view models, how they wire to a LifecycleOwner, and how this can positively impact your&rsquo;s app testability.
-To better describe how to build humble views we will be developing an elementary Sign-Up form with an email, a password text field and two buttons: a cancel that pops the user&rsquo;s back stack and a sign up that creates an account and moves the user to the home screen.">
-<meta name=author content>
-<link rel=canonical href=https://marcellogalhardo.dev/posts/2021/02/01/humble-views-proud-viewmodels/>
-<link crossorigin=anonymous href=/assets/css/stylesheet.min.5e2b4101351c21e906f398ae96901791830f58d430f96f2659dab7eaef7b3cb7.css integrity="sha256-XitBATUcIekG85iulpAXkYMPWNQw+W8mWdq36u97PLc=" rel="preload stylesheet" as=style>
-<script defer crossorigin=anonymous src=/assets/js/highlight.min.7680afc38aa6b15ddf158a4f3780b7b1f7dde7e91d26f073e6229bb7a0793c92.js integrity="sha256-doCvw4qmsV3fFYpPN4C3sffd5+kdJvBz5iKbt6B5PJI=" onload=hljs.initHighlightingOnLoad()></script>
-<link rel=icon href=https://marcellogalhardo.dev/favicon.ico>
-<link rel=icon type=image/png sizes=16x16 href=https://marcellogalhardo.dev/favicon-16x16.png>
-<link rel=icon type=image/png sizes=32x32 href=https://marcellogalhardo.dev/favicon-32x32.png>
-<link rel=apple-touch-icon href=https://marcellogalhardo.dev/apple-touch-icon.png>
-<link rel=mask-icon href=https://marcellogalhardo.dev/safari-pinned-tab.svg>
-<meta name=theme-color content="#2e2e33">
-<meta name=msapplication-TileColor content="#2e2e33">
-<meta name=generator content="Hugo 0.92.0">
-<noscript>
-<style>#theme-toggle,.top-link{display:none}</style>
-</noscript>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-7LK7ENB813"></script>
-<script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-7LK7ENB813',{anonymize_ip:!1})}</script>
-<meta property="og:title" content="Humble Views, Proud ViewModels">
-<meta property="og:description" content="The Android Community has long advocated that Activities and Fragments were views - but this perception has changed over time. For good. Let&rsquo;s dive deep into how to design views and view models, how they wire to a LifecycleOwner, and how this can positively impact your&rsquo;s app testability.
-To better describe how to build humble views we will be developing an elementary Sign-Up form with an email, a password text field and two buttons: a cancel that pops the user&rsquo;s back stack and a sign up that creates an account and moves the user to the home screen.">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://marcellogalhardo.dev/posts/2021/02/01/humble-views-proud-viewmodels/"><meta property="article:section" content="posts">
-<meta property="article:published_time" content="2021-02-01T09:02:50+01:00">
-<meta property="article:modified_time" content="2021-02-01T09:02:50+01:00"><meta property="og:site_name" content="Marcello Galhardo">
-<meta name=twitter:card content="summary">
-<meta name=twitter:title content="Humble Views, Proud ViewModels">
-<meta name=twitter:description content="The Android Community has long advocated that Activities and Fragments were views - but this perception has changed over time. For good. Let&rsquo;s dive deep into how to design views and view models, how they wire to a LifecycleOwner, and how this can positively impact your&rsquo;s app testability.
-To better describe how to build humble views we will be developing an elementary Sign-Up form with an email, a password text field and two buttons: a cancel that pops the user&rsquo;s back stack and a sign up that creates an account and moves the user to the home screen.">
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"https://marcellogalhardo.dev/posts/"},{"@type":"ListItem","position":2,"name":"Humble Views, Proud ViewModels","item":"https://marcellogalhardo.dev/posts/2021/02/01/humble-views-proud-viewmodels/"}]}</script>
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Humble Views, Proud ViewModels","name":"Humble Views, Proud ViewModels","description":"The Android Community has long advocated that Activities and Fragments were views - but this perception has changed over time. For good. Let\u0026rsquo;s dive deep into how to design views and view models, how they wire to a LifecycleOwner, and how this can positively impact your\u0026rsquo;s app testability.\nTo better describe how to build humble views we will be developing an elementary Sign-Up form with an email, a password text field and two buttons: a cancel that pops the user\u0026rsquo;s back stack and a sign up that creates an account and moves the user to the home screen.","keywords":["android","kotlin"],"articleBody":"The Android Community has long advocated that Activities and Fragments were views - but this perception has changed over time. For good. Let’s dive deep into how to design views and view models, how they wire to a LifecycleOwner, and how this can positively impact your’s app testability.\nTo better describe how to build humble views we will be developing an elementary Sign-Up form with an email, a password text field and two buttons: a cancel that pops the user’s back stack and a sign up that creates an account and moves the user to the home screen.\n “Fragment is not your View” - Juliano Moraes\n Heads-up: this article expects you to be familiar with Dependency Injection (but no particular framework), Coroutines, Fragment, and View Binding. I won’t use Jetpack’s ViewModel, but the code here is entirely compatible. I will not cover any other aspects outside humble Views and ViewModels.\nViews Views represent your UI. They can be written in code or, the most common way, using XML. Android views can not have a custom constructor as they must be created by the OS using reflection when inflating it from XML, during a configuration change, or process death.\nViews should not be aware of your architecture decisions. If you use MVP, MVC, MVVM, or MVI is irrelevant for a well-designed view.\nViews are hard to test and require an Instrumentation or Robolectric environment, which makes them slow. For that reason, we might want our views to be a Humble Object.\nclass SignUpView @JvmOverloads constructor( context: Context, attrs: AttributeSet? = null ) : ConstraintLayout(context, attrs) { private val binding = SignUpViewBinding.inflate(LayoutInflater.from(context), this) var email: String get() = binding.email.text set(value) { binding.email.setText(value) } var password: String get() = binding.email.text set(value) { binding.email.setText(value) } var isSignUpEnabled: Boolean get() = binding.signUpButton.isEnabled set(value) { binding.signUpButton.isEnabled = value } var onSignUpClicked: () - Unit = {} var onCancelClicked: () - Unit = {} var onEmailChanged: (String) - Unit = {} var onPasswordChanged: (String) - Unit = {} init { binding.signUpButton.setOnClickListener { onSignUpClicked() } binding.onCancelClicked.setOnClickListener { onCancelClicked() } binding.email.doOnTextChanged { text, _, _, _ - onEmailChanged(text) } binding.password.doOnTextChanged { text, _, _, _ - onPasswordChanged(text) } } } What is going on with this ViewBinding? In my View’s XML root, I use a  tag, and ViewBinding understands that: it provides me with an inflate function that attaches the view automatically to its parent.\nViewModels ViewModel’s are a lightweight representation of your UI. The ViewModel is responsible for coordinating any user interaction to any business model required. It may offer a one or two-way binding to let those business models interact with the GUI.\nclass SignUpViewModel( private val savedStateHandle: SavedStateHandle, private val scope: CoroutineScope, private val repository: SignUpRepository, ) { private val _navigation = Channel() val navigation = _navigation.receiveAsFlow() private val _toastMessage = Channel() val toastMessage = _toastMessage.receiveAsFlow() val email = savedStateHandle.getStateFlow(scope, \"email\", \"\") val password = savedStateHandle.getStateFlow(scope, \"password\", \"\") private val _isSignUpEnabled = savedStateHandle.getStateFlow(scope, \"isSignUpEnabled\", false) val isSignUpEnabled = _isSignUpEnabled.asStateFlow() init { email.collectIn(scope) { updateSignUpEnabled() } password.collectIn(scope) { updateSignUpEnabled() } } fun onSignUpClicked() { runCatching { // Try to parse e-mail and validate password. If yes, save.  val email: String = // parse e-mail.  val password: String = // verify if password is acceptable.  repository.signUp(email, password) }.fold( onSuccess = { _navigation.sendIn(scope, Navigation.Push(SignUpRoutes.Home)) }, onFailure = { _toastMessage.sendIn(scope, ToastMessage(R.string.generic_error)) }, ) } fun onCancelClicked() { _navigation.sendIn(scope, Navigation.Pop) } private fun updateSignUpEnabled() { // Naive logic to enable sign up.  _isSignUpEnabled = email.isNotBlank() \u0026\u0026 password.isNotBlank() } } Why expose some flows as MutableStateFlow and others no? Each field has a different requirement: two-way or one-way binding.\nTextFields requires a two-way binding as we want to get updates when the user types a new content while preserving the ability to update its content whenever necessary. Exposing it as a MutableStateFlow allows us to move all sanitization logic to the view model (see onSignUpClicked) and ensure the View is as humble as possible.\nThe sign-up button state requires a one-way binding (see isSignUpEnabled) - only the ViewModel can change its state based in a validation logic.\nWhy not modeling my UI State as a single flow in the ViewModel? The concepts here do not exclude a single view state, I believe they complement each other.\nYou can easily keep your view humble while modeling UI State as a single object on top of the ViewModel. In this case, the ViewModel would be responsible for handling the unidirectional data flow and doing the required diffs between each state emission within your bindings to enforce your UI is not being updated without demand. Therefore, let your view humble allow you to keep it agnostic of how you handle state, architecture decisions, and it enable you to test your ViewModel and classes above it as a unit very closely of how it would behave in the real world with a GUI: remember, the View is humble!\nI will not cover these concepts here but for a better understanding of why you would like to model your UI State as a single sealed hierarchy and how to do it well, I highly recommend my friend’s Stojan Anastasov post about the subject: Modeling UI State.\nLifecycleOwner The UI Controller. Usually, a Fragment responsible for a section of the screen. A LifecycleOwner is responsible to wire up a View to a ViewModel, delegate callbacks from the Android OS, handle configuration changes and more.\nclass SignUpFragment : Fragment() { // Retain the instance across configuration changes.  private val viewModel by retain { entry - val repository: SignUpRepository = // creates the repository  SignUpViewModel(entry.savedStateHandle, entry.scope, repository) } // Creates your View and connects to the ViewModel.  override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? { val view = SignUpView(requireContext()) // Bind the View and ViewModel  view.onSignUpClicked = viewModel::onSignUpClicked view.onCancelClicked = viewModel::onCancelClicked viewModel.email.observeIn(viewLifecycleOwner, view::email::set) viewModel.password.observeIn(viewLifecycleOwner, view::password::set) viewModel.isSignUpEnabled.observeIn(viewLifecycleOwner, view::isSignUpEnabled::set) // Other binds you might need with the view...  viewModel.navigation.observeIn(viewLifecycleOwner) { navigation - // Handle navigation.  } viewModel.toastMessage.observeIn(viewLifecycleOwner) { message - // Handle toast message.  } return view } } Testing We designed our View as a Humble Object to let us quickly test both View and ViewModel. As you might have perceived, the ViewModel is straightforward to write tests as we do not depend on any Android related class.\nclass SignUpViewModelTest { private val scope = TestCoroutineScope() // A fake version of the data source to not cross boundaries like network and database.  private val dataSource = TestDataSource() private fun createSut(): SignUpViewModel { return SignUpViewModel(SavedStateHandle(), scope, SignUpRepository(dataSource)) } // Set up, tear down, other tests, etc...  @Test fun `given email and password field is not blank when signing up then navigate to the home` { // Arrange Phase  val sut = createSut().apply { email = \"my.fake.person@gmail.com\" password = \"8S#@2LAaB_.NJh(Y\" } var actualNavigation: Navigation? = null scope.launch { sut.navigation.collect { actualNavigation = it } } // Act Phase  sut.onSignUpClicked() // Assert Phase  val expectedNavigation = Navigation.Push(SignUpRoutes.Home) assertThat(actualNavigation).isEqualTo(expectedNavigation) } } As the view is a humble object, there is nothing much to test on it. However, we might want to ensure that the UI behaves as expected when the ViewModel changes its attributes. For example:\nclass SignUpViewTest { @Test fun `given sign up is disabled then the button should not be clickable`() { launchViewInFragment { SignUpView(requireContext()) } .onView { it.isSignUpEnabled = false } onView(withId(R.id.signUpButton)) .check(matches(not(isEnabled()))) } } Conclusion It is relatively easy to see that View’s, in Android, are strongly tied to the concept of their functionality. Humble View’s is a way to create a clear separation between them and the Android Framework aiming for scalability, readability, and maybe the most essential point, testing.\nIn this article, we applied Humble Object pattern and MVVM concepts to create the circumstances that would allow developers to test View’s and ViewModel’s with ease even when they are strongly tied conceptually. Additionally, understanding that the LifecycleOwner is not your View will help you to ensure your code is highly testable.\nOther than testing, projects that use this approach can easily compose more complex View’s, and ViewModel’s, from smaller objects. Lastly, this approach fit with Jetpack’s Compose: replace the View with a @Composable and reuse the ViewModel!\nHappy Coding! 😎\nHelper functions \u0026 credits! I used Retained library to keep the state of the ViewModel in configuration changes. I also published all the helper functions as Github GISTs, so you can use them as you please.\nSpecial thanks to Maria Chietera, Tiago Dávila, Rafael Araujo, Tiago Cunha, Felipe Pedroso, and Stojan Anastasov proofread review! 🔍\nIf you like my posts, follow me on Twitter: @marcellogalhard\n","wordCount":"1421","inLanguage":"en","datePublished":"2021-02-01T09:02:50+01:00","dateModified":"2021-02-01T09:02:50+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://marcellogalhardo.dev/posts/2021/02/01/humble-views-proud-viewmodels/"},"publisher":{"@type":"Organization","name":"Marcello Galhardo","logo":{"@type":"ImageObject","url":"https://marcellogalhardo.dev/favicon.ico"}}}</script>
-</head>
-<body class=dark id=top>
-<header class=header>
-<nav class=nav>
-<div class=logo>
-<a href=https://marcellogalhardo.dev/ accesskey=h title="Marcello Galhardo (Alt + H)">Marcello Galhardo</a>
-<span class=logo-switches>
-</span>
-</div>
-<ul id=menu>
-<li>
-<a href=https://marcellogalhardo.dev/posts/ title=Posts>
-<span>Posts</span>
-</a>
-</li>
-<li>
-<a href=https://marcellogalhardo.dev/talks title=Talks>
-<span>Talks</span>
-</a>
-</li>
-<li>
-<a href=https://marcellogalhardo.dev/about title=About>
-<span>About</span>
-</a>
-</li>
-<li>
-<a href=https://marcellogalhardo.dev/uses title=Uses>
-<span>Uses</span>
-</a>
-</li>
-</ul>
-</nav>
-</header>
-<main class=main>
-<article class=post-single>
-<header class=post-header>
-<h1 class=post-title>
-Humble Views, Proud ViewModels
-</h1>
-<div class=post-meta>February 1, 2021
-</div>
-</header>
-<div class=post-content><p>The Android Community has long advocated that Activities and Fragments were views  -  but this perception has changed over time. For good. Let&rsquo;s dive deep into how to design views and view models, how they wire to a LifecycleOwner, and how this can positively impact your&rsquo;s app testability.</p>
-<p><img loading=lazy src=/images/2021/02/01/sign-up-form.png alt="Sign-Up Form">
-</p>
-<p>To better describe how to build humble views we will be developing an elementary Sign-Up form with an email, a password text field and two buttons: a cancel that pops the user&rsquo;s back stack and a sign up that creates an account and moves the user to the home screen.</p>
-<blockquote>
-<p><a href="https://medium.com/r?url=https%3A%2F%2Fnetflixtechblog.com%2Fmaking-our-android-studio-apps-reactive-with-ui-components-redux-5e37aac3b244">&ldquo;Fragment is not your View&rdquo; - Juliano Moraes</a></p>
-</blockquote>
-<p><strong>Heads-up:</strong> this article expects you to be familiar with Dependency Injection (but no particular framework), Coroutines, Fragment, and View Binding. I won&rsquo;t use Jetpack&rsquo;s ViewModel, but the code here is entirely compatible. I will not cover any other aspects outside humble Views and ViewModels.</p>
-<h1 id=views>Views<a hidden class=anchor aria-hidden=true href=#views>#</a></h1>
-<p><code>View</code>s represent your UI. They can be written in code or, the most common way, using XML. Android views can not have a custom constructor as they must be created by the OS using reflection when inflating it from XML, during a configuration change, or process death.</p>
-<p><code>View</code>s should not be aware of your architecture decisions. If you use MVP, MVC, MVVM, or MVI is irrelevant for a well-designed view.</p>
-<p><code>View</code>s are hard to test and require an Instrumentation or Robolectric environment, which makes them slow. For that reason, we might want our views to be a <a href=https://martinfowler.com/bliki/HumbleObject.html>Humble Object</a>.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SignUpView</span> <span style=color:#a6e22e>@JvmOverloads</span> <span style=color:#66d9ef>constructor</span>(
-    context: Context,
-    attrs: AttributeSet? = <span style=color:#66d9ef>null</span>
-) : ConstraintLayout(context, attrs) {
-
-    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> binding = SignUpViewBinding.inflate(LayoutInflater.from(context), <span style=color:#66d9ef>this</span>)
-
-    <span style=color:#66d9ef>var</span> email: String
-        <span style=color:#66d9ef>get</span>() = binding.email.text
-        <span style=color:#66d9ef>set</span>(value) { binding.email.setText(value) }
-
-    <span style=color:#66d9ef>var</span> password: String
-        <span style=color:#66d9ef>get</span>() = binding.email.text
-        <span style=color:#66d9ef>set</span>(value) { binding.email.setText(value) }
-
-    <span style=color:#66d9ef>var</span> isSignUpEnabled: Boolean
-        <span style=color:#66d9ef>get</span>() = binding.signUpButton.isEnabled
-        <span style=color:#66d9ef>set</span>(value) { binding.signUpButton.isEnabled = value }
-
-    <span style=color:#66d9ef>var</span> onSignUpClicked: () <span style=color:#f92672>-&gt;</span> Unit = {}
-    <span style=color:#66d9ef>var</span> onCancelClicked: () <span style=color:#f92672>-&gt;</span> Unit = {}
-    <span style=color:#66d9ef>var</span> onEmailChanged: (String) <span style=color:#f92672>-&gt;</span> Unit = {}
-    <span style=color:#66d9ef>var</span> onPasswordChanged: (String) <span style=color:#f92672>-&gt;</span> Unit = {}
-
-    <span style=color:#66d9ef>init</span> {
-        binding.signUpButton.setOnClickListener { onSignUpClicked() }
-        binding.onCancelClicked.setOnClickListener { onCancelClicked() }
-        binding.email.doOnTextChanged { text, _, _, _ <span style=color:#f92672>-&gt;</span>
-            onEmailChanged(text)
-        }
-        binding.password.doOnTextChanged { text, _, _, _ <span style=color:#f92672>-&gt;</span>
-            onPasswordChanged(text)
-        }
-    }
-}
-</code></pre></div><h4 id=what-is-going-on-with-this-viewbinding>What is going on with this ViewBinding?<a hidden class=anchor aria-hidden=true href=#what-is-going-on-with-this-viewbinding>#</a></h4>
-<p>In my <code>View</code>&rsquo;s XML root, I use a <code>&lt;merge></code> tag, and <code>ViewBinding</code> understands that: it provides me with an inflate function that attaches the view automatically to its parent.</p>
-<h1 id=viewmodels>ViewModels<a hidden class=anchor aria-hidden=true href=#viewmodels>#</a></h1>
-<p><code>ViewModel</code>&rsquo;s are a lightweight representation of your UI. The <code>ViewModel</code> is responsible for coordinating any user interaction to any business model required. It may offer a one or two-way binding to let those business models interact with the GUI.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SignUpViewModel</span>(
-  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> savedStateHandle: SavedStateHandle,
-  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> scope: CoroutineScope,
-  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> repository: SignUpRepository,
-) {
-
-  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> _navigation = Channel&lt;Navigation&gt;()
-  <span style=color:#66d9ef>val</span> navigation = _navigation.receiveAsFlow()
-
-  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> _toastMessage = Channel&lt;ToastMessage&gt;()
-  <span style=color:#66d9ef>val</span> toastMessage = _toastMessage.receiveAsFlow()
-
-  <span style=color:#66d9ef>val</span> email = savedStateHandle.getStateFlow&lt;String&gt;(scope, <span style=color:#e6db74>&#34;email&#34;</span>, <span style=color:#e6db74>&#34;&#34;</span>)
-
-  <span style=color:#66d9ef>val</span> password = savedStateHandle.getStateFlow&lt;String&gt;(scope, <span style=color:#e6db74>&#34;password&#34;</span>, <span style=color:#e6db74>&#34;&#34;</span>)
-
-  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> _isSignUpEnabled = savedStateHandle.getStateFlow&lt;Boolean&gt;(scope, <span style=color:#e6db74>&#34;isSignUpEnabled&#34;</span>, <span style=color:#66d9ef>false</span>)
-  <span style=color:#66d9ef>val</span> isSignUpEnabled = _isSignUpEnabled.asStateFlow()
-
-  <span style=color:#66d9ef>init</span> {
-    email.collectIn(scope) { updateSignUpEnabled() }
-    password.collectIn(scope) { updateSignUpEnabled() }
-  }
-
-  <span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>onSignUpClicked</span>() {
-    runCatching {
-      <span style=color:#75715e>// Try to parse e-mail and validate password. If yes, save.
-</span><span style=color:#75715e></span>      <span style=color:#66d9ef>val</span> email: String = <span style=color:#75715e>// parse e-mail.
-</span><span style=color:#75715e></span>      <span style=color:#66d9ef>val</span> password: String = <span style=color:#75715e>// verify if password is acceptable.
-</span><span style=color:#75715e></span>      repository.signUp(email, password)
-    }.fold(
-      onSuccess = { _navigation.sendIn(scope, Navigation.Push(SignUpRoutes.Home)) },
-      onFailure = { _toastMessage.sendIn(scope, ToastMessage(R.string.generic_error)) },
-    )
-  }
-
-  <span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>onCancelClicked</span>() {
-    _navigation.sendIn(scope, Navigation.Pop)
-  }
-
-  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>updateSignUpEnabled</span>() {
-    <span style=color:#75715e>// Naive logic to enable sign up.
-</span><span style=color:#75715e></span>    _isSignUpEnabled = email.isNotBlank() <span style=color:#f92672>&amp;&amp;</span> password.isNotBlank()
-  }
-}
-</code></pre></div><h4 id=why-expose-some-flows-as-mutablestateflow-and-othersno>Why expose some flows as MutableStateFlow and others no?<a hidden class=anchor aria-hidden=true href=#why-expose-some-flows-as-mutablestateflow-and-othersno>#</a></h4>
-<p>Each field has a different requirement: two-way or one-way binding.</p>
-<p>TextFields requires a two-way binding as we want to get updates when the user types a new content while preserving the ability to update its content whenever necessary. Exposing it as a <code>MutableStateFlow</code> allows us to move all sanitization logic to the view model (see <code>onSignUpClicked</code>) and ensure the View is as humble as possible.</p>
-<p>The sign-up button state requires a one-way binding (see <code>isSignUpEnabled</code>)  -  only the <code>ViewModel</code> can change its state based in a validation logic.</p>
-<h4 id=why-not-modeling-my-ui-state-as-a-single-flow-in-the-viewmodel>Why not modeling my UI State as a single flow in the ViewModel?<a hidden class=anchor aria-hidden=true href=#why-not-modeling-my-ui-state-as-a-single-flow-in-the-viewmodel>#</a></h4>
-<p>The concepts here do not exclude a single view state, I believe they complement each other.</p>
-<p>You can easily keep your view humble while modeling UI State as a single object on top of the ViewModel. In this case, the <code>ViewModel</code> would be responsible for handling the unidirectional data flow and doing the required diffs between each state emission within your bindings to enforce your UI is not being updated without demand. Therefore, let your view humble allow you to keep it agnostic of how you handle state, architecture decisions, and it enable you to test your <code>ViewModel</code> and classes above it as a unit very closely of how it would behave in the real world with a GUI: remember, the <code>View</code> is humble!</p>
-<p>I will not cover these concepts here but for a better understanding of why you would like to model your UI State as a single sealed hierarchy and how to do it well, I highly recommend my friend&rsquo;s <a href=https://twitter.com/s_anastasov>Stojan Anastasov</a> post about the subject: <a href=https://lordraydenmk.github.io/2021/modelling-ui-state/>Modeling UI State</a>.</p>
-<h1 id=lifecycleowner>LifecycleOwner<a hidden class=anchor aria-hidden=true href=#lifecycleowner>#</a></h1>
-<p>The UI Controller. Usually, a <code>Fragment</code> responsible for a section of the screen. A <code>LifecycleOwner</code> is responsible to wire up a <code>View</code> to a <code>ViewModel</code>, delegate callbacks from the Android OS, handle configuration changes and more.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SignUpFragment</span> : Fragment() {
-
-    <span style=color:#75715e>// Retain the instance across configuration changes.
-</span><span style=color:#75715e></span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> viewModel <span style=color:#66d9ef>by</span> retain { entry <span style=color:#f92672>-&gt;</span>
-        <span style=color:#66d9ef>val</span> repository: SignUpRepository = <span style=color:#75715e>// creates the repository
-</span><span style=color:#75715e></span>            SignUpViewModel(entry.savedStateHandle, entry.scope, repository)
-    }
-
-    <span style=color:#75715e>// Creates your View and connects to the ViewModel.
-</span><span style=color:#75715e></span>    <span style=color:#66d9ef>override</span> <span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>onCreateView</span>(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        <span style=color:#66d9ef>val</span> view = SignUpView(requireContext())
-
-        <span style=color:#75715e>// Bind the View and ViewModel
-</span><span style=color:#75715e></span>        view.onSignUpClicked = viewModel<span style=color:#f92672>::</span>onSignUpClicked
-        view.onCancelClicked = viewModel<span style=color:#f92672>::</span>onCancelClicked
-        viewModel.email.observeIn(viewLifecycleOwner, view<span style=color:#f92672>::</span>email<span style=color:#f92672>::</span><span style=color:#66d9ef>set</span>)
-        viewModel.password.observeIn(viewLifecycleOwner, view<span style=color:#f92672>::</span>password<span style=color:#f92672>::</span><span style=color:#66d9ef>set</span>)
-        viewModel.isSignUpEnabled.observeIn(viewLifecycleOwner, view<span style=color:#f92672>::</span>isSignUpEnabled<span style=color:#f92672>::</span><span style=color:#66d9ef>set</span>)
-        <span style=color:#75715e>// Other binds you might need with the view...
-</span><span style=color:#75715e></span>        viewModel.navigation.observeIn(viewLifecycleOwner) { navigation <span style=color:#f92672>-&gt;</span>
-            <span style=color:#75715e>// Handle navigation.
-</span><span style=color:#75715e></span>        }
-        viewModel.toastMessage.observeIn(viewLifecycleOwner) { message <span style=color:#f92672>-&gt;</span>
-            <span style=color:#75715e>// Handle toast message.
-</span><span style=color:#75715e></span>        }
-
-        <span style=color:#66d9ef>return</span> view
-    }
-}
-</code></pre></div><h1 id=testing>Testing<a hidden class=anchor aria-hidden=true href=#testing>#</a></h1>
-<p>We designed our View as a Humble Object to let us quickly test both <code>View</code> and <code>ViewModel</code>. As you might have perceived, the <code>ViewModel</code> is straightforward to write tests as we do not depend on any Android related class.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SignUpViewModelTest</span> {
-
-  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> scope = TestCoroutineScope()
-
-  <span style=color:#75715e>// A fake version of the data source to not cross boundaries like network and database.
-</span><span style=color:#75715e></span>  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> dataSource = TestDataSource()
-
-  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>createSut</span>(): SignUpViewModel {
-    <span style=color:#66d9ef>return</span> SignUpViewModel(SavedStateHandle(), scope, SignUpRepository(dataSource))
-  }
-
-  <span style=color:#75715e>// Set up, tear down, other tests, etc...
-</span><span style=color:#75715e></span>
-  <span style=color:#a6e22e>@Test</span>
-  <span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>`given email and password field is not blank when signing up then navigate to the home`</span> {
-    <span style=color:#75715e>// Arrange Phase
-</span><span style=color:#75715e></span>    <span style=color:#66d9ef>val</span> sut = createSut().apply {
-      email = <span style=color:#e6db74>&#34;my.fake.person@gmail.com&#34;</span>
-      password = <span style=color:#e6db74>&#34;8S#@2LAaB_.NJh(Y&#34;</span>
-    }
-    <span style=color:#66d9ef>var</span> actualNavigation: Navigation? = <span style=color:#66d9ef>null</span>
-    scope.launch { sut.navigation.collect { actualNavigation = <span style=color:#66d9ef>it</span> } }
-
-    <span style=color:#75715e>// Act Phase
-</span><span style=color:#75715e></span>    sut.onSignUpClicked()
-
-    <span style=color:#75715e>// Assert Phase
-</span><span style=color:#75715e></span>    <span style=color:#66d9ef>val</span> expectedNavigation = Navigation.Push(SignUpRoutes.Home)
-    assertThat(actualNavigation).isEqualTo(expectedNavigation)
-  }
-}
-</code></pre></div><p>As the view is a humble object, there is nothing much to test on it. However, we might want to ensure that the UI behaves as expected when the <code>ViewModel</code> changes its attributes. For example:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SignUpViewTest</span> {
-
-  <span style=color:#a6e22e>@Test</span>
-  <span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>`given sign up is disabled then the button should not be clickable`</span>() {
-    launchViewInFragment { SignUpView(requireContext()) }
-      .onView { <span style=color:#66d9ef>it</span>.isSignUpEnabled = <span style=color:#66d9ef>false</span> }
-    
-    onView(withId(R.id.signUpButton))
-      .check(matches(not(isEnabled())))
-  }
-}
-</code></pre></div><h1 id=conclusion>Conclusion<a hidden class=anchor aria-hidden=true href=#conclusion>#</a></h1>
-<p>It is relatively easy to see that <code>View</code>&rsquo;s, in Android, are strongly tied to the concept of their functionality. Humble View&rsquo;s is a way to create a clear separation between them and the Android Framework aiming for scalability, readability, and maybe the most essential point, testing.</p>
-<p>In this article, we applied Humble Object pattern and MVVM concepts to create the circumstances that would allow developers to test <code>View</code>&rsquo;s and <code>ViewModel</code>&rsquo;s with ease even when they are strongly tied conceptually. Additionally, understanding that the <code>LifecycleOwner</code> is not your <code>View</code> will help you to ensure your code is highly testable.</p>
-<p>Other than testing, projects that use this approach can easily compose more complex <code>View</code>&rsquo;s, and <code>ViewModel</code>&rsquo;s, from smaller objects. Lastly, this approach fit with Jetpack&rsquo;s Compose: replace the <code>View</code> with a <code>@Composable</code> and reuse the <code>ViewModel</code>!</p>
-<p><strong>Happy Coding!</strong> 😎</p>
-<h1 id=helper-functions--credits>Helper functions & credits!<a hidden class=anchor aria-hidden=true href=#helper-functions--credits>#</a></h1>
-<p>I used <a href=http://github.com/marcellogalhardo/retained>Retained</a> library to keep the state of the <code>ViewModel</code> in configuration changes. I also published all the helper functions as <a href=https://gist.github.com/marcellogalhardo/a9985f7b3875fa41c379a2ba65d8ac9c>Github GISTs</a>, so you can use them as you please.</p>
-<p>Special thanks to <a href=https://twitter.com/maryte_chietera>Maria Chietera</a>, <a href=https://twitter.com/TiagoDvl>Tiago Dávila</a>, <a href=https://twitter.com/orafaaraujo>Rafael Araujo</a>, <a href=https://twitter.com/laggedHero>Tiago Cunha</a>, <a href=https://twitter.com/felipeapedroso>Felipe Pedroso</a>, and <a href=https://twitter.com/s_anastasov>Stojan Anastasov</a> proofread review! 🔍</p>
-<p>If you like my posts, follow me on Twitter: <a href=https://twitter.com/marcellogalhard>@marcellogalhard</a></p>
-</div>
-<footer class=post-footer>
-<ul class=post-tags>
-<li><a href=https://marcellogalhardo.dev/tags/android/>android</a></li>
-<li><a href=https://marcellogalhardo.dev/tags/kotlin/>kotlin</a></li>
-</ul>
-</footer>
-</article>
-</main>
-<footer class=footer>
-<div class=footer__inner>
-<div class=footer__content>
-<span>&copy; 2022</span>
-<span><a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></span><span><a href=https://marcellogalhardo.dev/posts/index.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a></span>
-</div>
-</div>
-</footer>
-</body>
-</html>
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Humble Views, Proud ViewModels | Marcello Galhardo</title><meta name=keywords content="android,kotlin"><meta name=description content="The Android Community has long advocated that Activities and Fragments were views - but this perception has changed over time. For good. Let&rsquo;s dive deep into how to design views and view models, how they wire to a LifecycleOwner, and how this can positively impact your&rsquo;s app testability.
+To better describe how to build humble views we will be developing an elementary Sign-Up form with an email, a password text field and two buttons: a cancel that pops the user&rsquo;s back stack and a sign up that creates an account and moves the user to the home screen."><meta name=author content><link rel=canonical href=https://marcellogalhardo.dev/posts/2021/02/01/humble-views-proud-viewmodels/><link href=https://androiddev.social/@mg rel=me><link crossorigin=anonymous href=/assets/css/stylesheet.min.5e2b4101351c21e906f398ae96901791830f58d430f96f2659dab7eaef7b3cb7.css integrity="sha256-XitBATUcIekG85iulpAXkYMPWNQw+W8mWdq36u97PLc=" rel="preload stylesheet" as=style><script defer crossorigin=anonymous src=/assets/js/highlight.min.b95bacdc39e37a332a9f883b1e78be4abc1fdca2bc1f2641f55e3cd3dabd4d61.js integrity="sha256-uVus3DnjejMqn4g7Hni+Srwf3KK8HyZB9V4809q9TWE=" onload=hljs.initHighlightingOnLoad()></script>
+<link rel=icon href=https://marcellogalhardo.dev/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://marcellogalhardo.dev/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://marcellogalhardo.dev/favicon-32x32.png><link rel=apple-touch-icon href=https://marcellogalhardo.dev/apple-touch-icon.png><link rel=mask-icon href=https://marcellogalhardo.dev/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><meta name=generator content="Hugo 0.107.0"><noscript><style>#theme-toggle,.top-link{display:none}</style></noscript><script async src="https://www.googletagmanager.com/gtag/js?id=G-7LK7ENB813"></script>
+<script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-7LK7ENB813",{anonymize_ip:!1})}</script><meta property="og:title" content="Humble Views, Proud ViewModels"><meta property="og:description" content="The Android Community has long advocated that Activities and Fragments were views - but this perception has changed over time. For good. Let&rsquo;s dive deep into how to design views and view models, how they wire to a LifecycleOwner, and how this can positively impact your&rsquo;s app testability.
+To better describe how to build humble views we will be developing an elementary Sign-Up form with an email, a password text field and two buttons: a cancel that pops the user&rsquo;s back stack and a sign up that creates an account and moves the user to the home screen."><meta property="og:type" content="article"><meta property="og:url" content="https://marcellogalhardo.dev/posts/2021/02/01/humble-views-proud-viewmodels/"><meta property="article:section" content="posts"><meta property="article:published_time" content="2021-02-01T09:02:50+01:00"><meta property="article:modified_time" content="2021-02-01T09:02:50+01:00"><meta property="og:site_name" content="Marcello Galhardo"><meta name=twitter:card content="summary"><meta name=twitter:title content="Humble Views, Proud ViewModels"><meta name=twitter:description content="The Android Community has long advocated that Activities and Fragments were views - but this perception has changed over time. For good. Let&rsquo;s dive deep into how to design views and view models, how they wire to a LifecycleOwner, and how this can positively impact your&rsquo;s app testability.
+To better describe how to build humble views we will be developing an elementary Sign-Up form with an email, a password text field and two buttons: a cancel that pops the user&rsquo;s back stack and a sign up that creates an account and moves the user to the home screen."><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"https://marcellogalhardo.dev/posts/"},{"@type":"ListItem","position":2,"name":"Humble Views, Proud ViewModels","item":"https://marcellogalhardo.dev/posts/2021/02/01/humble-views-proud-viewmodels/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Humble Views, Proud ViewModels","name":"Humble Views, Proud ViewModels","description":"The Android Community has long advocated that Activities and Fragments were views - but this perception has changed over time. For good. Let\u0026rsquo;s dive deep into how to design views and view models, how they wire to a LifecycleOwner, and how this can positively impact your\u0026rsquo;s app testability.\nTo better describe how to build humble views we will be developing an elementary Sign-Up form with an email, a password text field and two buttons: a cancel that pops the user\u0026rsquo;s back stack and a sign up that creates an account and moves the user to the home screen.","keywords":["android","kotlin"],"articleBody":"The Android Community has long advocated that Activities and Fragments were views - but this perception has changed over time. For good. Let’s dive deep into how to design views and view models, how they wire to a LifecycleOwner, and how this can positively impact your’s app testability.\nTo better describe how to build humble views we will be developing an elementary Sign-Up form with an email, a password text field and two buttons: a cancel that pops the user’s back stack and a sign up that creates an account and moves the user to the home screen.\n“Fragment is not your View” - Juliano Moraes\nHeads-up: this article expects you to be familiar with Dependency Injection (but no particular framework), Coroutines, Fragment, and View Binding. I won’t use Jetpack’s ViewModel, but the code here is entirely compatible. I will not cover any other aspects outside humble Views and ViewModels.\nViews Views represent your UI. They can be written in code or, the most common way, using XML. Android views can not have a custom constructor as they must be created by the OS using reflection when inflating it from XML, during a configuration change, or process death.\nViews should not be aware of your architecture decisions. If you use MVP, MVC, MVVM, or MVI is irrelevant for a well-designed view.\nViews are hard to test and require an Instrumentation or Robolectric environment, which makes them slow. For that reason, we might want our views to be a Humble Object.\nclass SignUpView @JvmOverloads constructor( context: Context, attrs: AttributeSet? = null ) : ConstraintLayout(context, attrs) { private val binding = SignUpViewBinding.inflate(LayoutInflater.from(context), this) var email: String get() = binding.email.text set(value) { binding.email.setText(value) } var password: String get() = binding.email.text set(value) { binding.email.setText(value) } var isSignUpEnabled: Boolean get() = binding.signUpButton.isEnabled set(value) { binding.signUpButton.isEnabled = value } var onSignUpClicked: () -\u003e Unit = {} var onCancelClicked: () -\u003e Unit = {} var onEmailChanged: (String) -\u003e Unit = {} var onPasswordChanged: (String) -\u003e Unit = {} init { binding.signUpButton.setOnClickListener { onSignUpClicked() } binding.onCancelClicked.setOnClickListener { onCancelClicked() } binding.email.doOnTextChanged { text, _, _, _ -\u003e onEmailChanged(text) } binding.password.doOnTextChanged { text, _, _, _ -\u003e onPasswordChanged(text) } } } What is going on with this ViewBinding? In my View’s XML root, I use a tag, and ViewBinding understands that: it provides me with an inflate function that attaches the view automatically to its parent.\nViewModels ViewModel’s are a lightweight representation of your UI. The ViewModel is responsible for coordinating any user interaction to any business model required. It may offer a one or two-way binding to let those business models interact with the GUI.\nclass SignUpViewModel( private val savedStateHandle: SavedStateHandle, private val scope: CoroutineScope, private val repository: SignUpRepository, ) { private val _navigation = Channel() val navigation = _navigation.receiveAsFlow() private val _toastMessage = Channel() val toastMessage = _toastMessage.receiveAsFlow() val email = savedStateHandle.getStateFlow(scope, \"email\", \"\") val password = savedStateHandle.getStateFlow(scope, \"password\", \"\") private val _isSignUpEnabled = savedStateHandle.getStateFlow(scope, \"isSignUpEnabled\", false) val isSignUpEnabled = _isSignUpEnabled.asStateFlow() init { email.collectIn(scope) { updateSignUpEnabled() } password.collectIn(scope) { updateSignUpEnabled() } } fun onSignUpClicked() { runCatching { // Try to parse e-mail and validate password. If yes, save. val email: String = // parse e-mail. val password: String = // verify if password is acceptable. repository.signUp(email, password) }.fold( onSuccess = { _navigation.sendIn(scope, Navigation.Push(SignUpRoutes.Home)) }, onFailure = { _toastMessage.sendIn(scope, ToastMessage(R.string.generic_error)) }, ) } fun onCancelClicked() { _navigation.sendIn(scope, Navigation.Pop) } private fun updateSignUpEnabled() { // Naive logic to enable sign up. _isSignUpEnabled = email.isNotBlank() \u0026\u0026 password.isNotBlank() } } Why expose some flows as MutableStateFlow and others no? Each field has a different requirement: two-way or one-way binding.\nTextFields requires a two-way binding as we want to get updates when the user types a new content while preserving the ability to update its content whenever necessary. Exposing it as a MutableStateFlow allows us to move all sanitization logic to the view model (see onSignUpClicked) and ensure the View is as humble as possible.\nThe sign-up button state requires a one-way binding (see isSignUpEnabled) - only the ViewModel can change its state based in a validation logic.\nWhy not modeling my UI State as a single flow in the ViewModel? The concepts here do not exclude a single view state, I believe they complement each other.\nYou can easily keep your view humble while modeling UI State as a single object on top of the ViewModel. In this case, the ViewModel would be responsible for handling the unidirectional data flow and doing the required diffs between each state emission within your bindings to enforce your UI is not being updated without demand. Therefore, let your view humble allow you to keep it agnostic of how you handle state, architecture decisions, and it enable you to test your ViewModel and classes above it as a unit very closely of how it would behave in the real world with a GUI: remember, the View is humble!\nI will not cover these concepts here but for a better understanding of why you would like to model your UI State as a single sealed hierarchy and how to do it well, I highly recommend my friend’s Stojan Anastasov post about the subject: Modeling UI State.\nLifecycleOwner The UI Controller. Usually, a Fragment responsible for a section of the screen. A LifecycleOwner is responsible to wire up a View to a ViewModel, delegate callbacks from the Android OS, handle configuration changes and more.\nclass SignUpFragment : Fragment() { // Retain the instance across configuration changes. private val viewModel by retain { entry -\u003e val repository: SignUpRepository = // creates the repository SignUpViewModel(entry.savedStateHandle, entry.scope, repository) } // Creates your View and connects to the ViewModel. override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? { val view = SignUpView(requireContext()) // Bind the View and ViewModel view.onSignUpClicked = viewModel::onSignUpClicked view.onCancelClicked = viewModel::onCancelClicked viewModel.email.observeIn(viewLifecycleOwner, view::email::set) viewModel.password.observeIn(viewLifecycleOwner, view::password::set) viewModel.isSignUpEnabled.observeIn(viewLifecycleOwner, view::isSignUpEnabled::set) // Other binds you might need with the view... viewModel.navigation.observeIn(viewLifecycleOwner) { navigation -\u003e // Handle navigation. } viewModel.toastMessage.observeIn(viewLifecycleOwner) { message -\u003e // Handle toast message. } return view } } Testing We designed our View as a Humble Object to let us quickly test both View and ViewModel. As you might have perceived, the ViewModel is straightforward to write tests as we do not depend on any Android related class.\nclass SignUpViewModelTest { private val scope = TestCoroutineScope() // A fake version of the data source to not cross boundaries like network and database. private val dataSource = TestDataSource() private fun createSut(): SignUpViewModel { return SignUpViewModel(SavedStateHandle(), scope, SignUpRepository(dataSource)) } // Set up, tear down, other tests, etc... @Test fun `given email and password field is not blank when signing up then navigate to the home` { // Arrange Phase val sut = createSut().apply { email = \"my.fake.person@gmail.com\" password = \"8S#@2LAaB_.NJh(Y\" } var actualNavigation: Navigation? = null scope.launch { sut.navigation.collect { actualNavigation = it } } // Act Phase sut.onSignUpClicked() // Assert Phase val expectedNavigation = Navigation.Push(SignUpRoutes.Home) assertThat(actualNavigation).isEqualTo(expectedNavigation) } } As the view is a humble object, there is nothing much to test on it. However, we might want to ensure that the UI behaves as expected when the ViewModel changes its attributes. For example:\nclass SignUpViewTest { @Test fun `given sign up is disabled then the button should not be clickable`() { launchViewInFragment { SignUpView(requireContext()) } .onView { it.isSignUpEnabled = false } onView(withId(R.id.signUpButton)) .check(matches(not(isEnabled()))) } } Conclusion It is relatively easy to see that View’s, in Android, are strongly tied to the concept of their functionality. Humble View’s is a way to create a clear separation between them and the Android Framework aiming for scalability, readability, and maybe the most essential point, testing.\nIn this article, we applied Humble Object pattern and MVVM concepts to create the circumstances that would allow developers to test View’s and ViewModel’s with ease even when they are strongly tied conceptually. Additionally, understanding that the LifecycleOwner is not your View will help you to ensure your code is highly testable.\nOther than testing, projects that use this approach can easily compose more complex View’s, and ViewModel’s, from smaller objects. Lastly, this approach fit with Jetpack’s Compose: replace the View with a @Composable and reuse the ViewModel!\nHappy Coding! 😎\nHelper functions \u0026 credits! I used Retained library to keep the state of the ViewModel in configuration changes. I also published all the helper functions as Github GISTs, so you can use them as you please.\nSpecial thanks to Maria Chietera, Tiago Dávila, Rafael Araujo, Tiago Cunha, Felipe Pedroso, and Stojan Anastasov proofread review! 🔍\nIf you like my posts, follow me on Twitter: @marcellogalhard\n","wordCount":"1421","inLanguage":"en","datePublished":"2021-02-01T09:02:50+01:00","dateModified":"2021-02-01T09:02:50+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://marcellogalhardo.dev/posts/2021/02/01/humble-views-proud-viewmodels/"},"publisher":{"@type":"Organization","name":"Marcello Galhardo","logo":{"@type":"ImageObject","url":"https://marcellogalhardo.dev/favicon.ico"}}}</script></head><body class=dark id=top><header class=header><nav class=nav><div class=logo><a href=https://marcellogalhardo.dev/ accesskey=h title="Marcello Galhardo (Alt + H)">Marcello Galhardo</a>
+<span class=logo-switches></span></div><ul id=menu><li><a href=https://marcellogalhardo.dev/posts/ title=Posts><span>Posts</span></a></li><li><a href=https://marcellogalhardo.dev/talks title=Talks><span>Talks</span></a></li><li><a href=https://marcellogalhardo.dev/about title=About><span>About</span></a></li><li><a href=https://marcellogalhardo.dev/uses title=Uses><span>Uses</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class=post-title>Humble Views, Proud ViewModels</h1><div class=post-meta>February 1, 2021</div></header><div class=post-content><p>The Android Community has long advocated that Activities and Fragments were views  -  but this perception has changed over time. For good. Let&rsquo;s dive deep into how to design views and view models, how they wire to a LifecycleOwner, and how this can positively impact your&rsquo;s app testability.</p><p><img loading=lazy src=/images/2021/02/01/sign-up-form.png alt="Sign-Up Form"></p><p>To better describe how to build humble views we will be developing an elementary Sign-Up form with an email, a password text field and two buttons: a cancel that pops the user&rsquo;s back stack and a sign up that creates an account and moves the user to the home screen.</p><blockquote><p><a href="https://medium.com/r?url=https%3A%2F%2Fnetflixtechblog.com%2Fmaking-our-android-studio-apps-reactive-with-ui-components-redux-5e37aac3b244">&ldquo;Fragment is not your View&rdquo; - Juliano Moraes</a></p></blockquote><p><strong>Heads-up:</strong> this article expects you to be familiar with Dependency Injection (but no particular framework), Coroutines, Fragment, and View Binding. I won&rsquo;t use Jetpack&rsquo;s ViewModel, but the code here is entirely compatible. I will not cover any other aspects outside humble Views and ViewModels.</p><h1 id=views>Views<a hidden class=anchor aria-hidden=true href=#views>#</a></h1><p><code>View</code>s represent your UI. They can be written in code or, the most common way, using XML. Android views can not have a custom constructor as they must be created by the OS using reflection when inflating it from XML, during a configuration change, or process death.</p><p><code>View</code>s should not be aware of your architecture decisions. If you use MVP, MVC, MVVM, or MVI is irrelevant for a well-designed view.</p><p><code>View</code>s are hard to test and require an Instrumentation or Robolectric environment, which makes them slow. For that reason, we might want our views to be a <a href=https://martinfowler.com/bliki/HumbleObject.html>Humble Object</a>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SignUpView</span> <span style=color:#a6e22e>@JvmOverloads</span> <span style=color:#66d9ef>constructor</span>(
+</span></span><span style=display:flex><span>    context: Context,
+</span></span><span style=display:flex><span>    attrs: AttributeSet? = <span style=color:#66d9ef>null</span>
+</span></span><span style=display:flex><span>) : ConstraintLayout(context, attrs) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> binding = <span style=color:#a6e22e>SignUpViewBinding</span>.inflate(<span style=color:#a6e22e>LayoutInflater</span>.from(context), <span style=color:#66d9ef>this</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> email: String
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>get</span>() = binding.email.text
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>set</span>(<span style=color:#66d9ef>value</span>) { binding.email.setText(<span style=color:#66d9ef>value</span>) }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> password: String
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>get</span>() = binding.email.text
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>set</span>(<span style=color:#66d9ef>value</span>) { binding.email.setText(<span style=color:#66d9ef>value</span>) }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> isSignUpEnabled: Boolean
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>get</span>() = binding.signUpButton.isEnabled
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>set</span>(<span style=color:#66d9ef>value</span>) { binding.signUpButton.isEnabled = <span style=color:#66d9ef>value</span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> onSignUpClicked: () <span style=color:#f92672>-&gt;</span> Unit = {}
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> onCancelClicked: () <span style=color:#f92672>-&gt;</span> Unit = {}
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> onEmailChanged: (String) <span style=color:#f92672>-&gt;</span> Unit = {}
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> onPasswordChanged: (String) <span style=color:#f92672>-&gt;</span> Unit = {}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>init</span> {
+</span></span><span style=display:flex><span>        binding.signUpButton.setOnClickListener { onSignUpClicked() }
+</span></span><span style=display:flex><span>        binding.onCancelClicked.setOnClickListener { onCancelClicked() }
+</span></span><span style=display:flex><span>        binding.email.doOnTextChanged { text, _, _, _ <span style=color:#f92672>-&gt;</span>
+</span></span><span style=display:flex><span>            onEmailChanged(text)
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        binding.password.doOnTextChanged { text, _, _, _ <span style=color:#f92672>-&gt;</span>
+</span></span><span style=display:flex><span>            onPasswordChanged(text)
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h4 id=what-is-going-on-with-this-viewbinding>What is going on with this ViewBinding?<a hidden class=anchor aria-hidden=true href=#what-is-going-on-with-this-viewbinding>#</a></h4><p>In my <code>View</code>&rsquo;s XML root, I use a <code>&lt;merge></code> tag, and <code>ViewBinding</code> understands that: it provides me with an inflate function that attaches the view automatically to its parent.</p><h1 id=viewmodels>ViewModels<a hidden class=anchor aria-hidden=true href=#viewmodels>#</a></h1><p><code>ViewModel</code>&rsquo;s are a lightweight representation of your UI. The <code>ViewModel</code> is responsible for coordinating any user interaction to any business model required. It may offer a one or two-way binding to let those business models interact with the GUI.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SignUpViewModel</span>(
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> savedStateHandle: SavedStateHandle,
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> scope: CoroutineScope,
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> repository: SignUpRepository,
+</span></span><span style=display:flex><span>) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> _navigation = Channel&lt;Navigation&gt;()
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>val</span> navigation = _navigation.receiveAsFlow()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> _toastMessage = Channel&lt;ToastMessage&gt;()
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>val</span> toastMessage = _toastMessage.receiveAsFlow()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>val</span> email = savedStateHandle.getStateFlow&lt;String&gt;(scope, <span style=color:#e6db74>&#34;email&#34;</span>, <span style=color:#e6db74>&#34;&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>val</span> password = savedStateHandle.getStateFlow&lt;String&gt;(scope, <span style=color:#e6db74>&#34;password&#34;</span>, <span style=color:#e6db74>&#34;&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> _isSignUpEnabled = savedStateHandle.getStateFlow&lt;Boolean&gt;(scope, <span style=color:#e6db74>&#34;isSignUpEnabled&#34;</span>, <span style=color:#66d9ef>false</span>)
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>val</span> isSignUpEnabled = _isSignUpEnabled.asStateFlow()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>init</span> {
+</span></span><span style=display:flex><span>    email.collectIn(scope) { updateSignUpEnabled() }
+</span></span><span style=display:flex><span>    password.collectIn(scope) { updateSignUpEnabled() }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>onSignUpClicked</span>() {
+</span></span><span style=display:flex><span>    runCatching {
+</span></span><span style=display:flex><span>      <span style=color:#75715e>// Try to parse e-mail and validate password. If yes, save.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>      <span style=color:#66d9ef>val</span> email: String = <span style=color:#75715e>// parse e-mail.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>      <span style=color:#66d9ef>val</span> password: String = <span style=color:#75715e>// verify if password is acceptable.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>      repository.signUp(email, password)
+</span></span><span style=display:flex><span>    }.fold(
+</span></span><span style=display:flex><span>      onSuccess = { _navigation.sendIn(scope, <span style=color:#a6e22e>Navigation</span>.Push(<span style=color:#a6e22e>SignUpRoutes</span>.Home)) },
+</span></span><span style=display:flex><span>      onFailure = { _toastMessage.sendIn(scope, ToastMessage(<span style=color:#a6e22e>R</span>.string.generic_error)) },
+</span></span><span style=display:flex><span>    )
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>onCancelClicked</span>() {
+</span></span><span style=display:flex><span>    _navigation.sendIn(scope, <span style=color:#a6e22e>Navigation</span>.Pop)
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>updateSignUpEnabled</span>() {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Naive logic to enable sign up.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    _isSignUpEnabled = email.isNotBlank() <span style=color:#f92672>&amp;&amp;</span> password.isNotBlank()
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h4 id=why-expose-some-flows-as-mutablestateflow-and-othersno>Why expose some flows as MutableStateFlow and others no?<a hidden class=anchor aria-hidden=true href=#why-expose-some-flows-as-mutablestateflow-and-othersno>#</a></h4><p>Each field has a different requirement: two-way or one-way binding.</p><p>TextFields requires a two-way binding as we want to get updates when the user types a new content while preserving the ability to update its content whenever necessary. Exposing it as a <code>MutableStateFlow</code> allows us to move all sanitization logic to the view model (see <code>onSignUpClicked</code>) and ensure the View is as humble as possible.</p><p>The sign-up button state requires a one-way binding (see <code>isSignUpEnabled</code>)  -  only the <code>ViewModel</code> can change its state based in a validation logic.</p><h4 id=why-not-modeling-my-ui-state-as-a-single-flow-in-the-viewmodel>Why not modeling my UI State as a single flow in the ViewModel?<a hidden class=anchor aria-hidden=true href=#why-not-modeling-my-ui-state-as-a-single-flow-in-the-viewmodel>#</a></h4><p>The concepts here do not exclude a single view state, I believe they complement each other.</p><p>You can easily keep your view humble while modeling UI State as a single object on top of the ViewModel. In this case, the <code>ViewModel</code> would be responsible for handling the unidirectional data flow and doing the required diffs between each state emission within your bindings to enforce your UI is not being updated without demand. Therefore, let your view humble allow you to keep it agnostic of how you handle state, architecture decisions, and it enable you to test your <code>ViewModel</code> and classes above it as a unit very closely of how it would behave in the real world with a GUI: remember, the <code>View</code> is humble!</p><p>I will not cover these concepts here but for a better understanding of why you would like to model your UI State as a single sealed hierarchy and how to do it well, I highly recommend my friend&rsquo;s <a href=https://twitter.com/s_anastasov>Stojan Anastasov</a> post about the subject: <a href=https://lordraydenmk.github.io/2021/modelling-ui-state/>Modeling UI State</a>.</p><h1 id=lifecycleowner>LifecycleOwner<a hidden class=anchor aria-hidden=true href=#lifecycleowner>#</a></h1><p>The UI Controller. Usually, a <code>Fragment</code> responsible for a section of the screen. A <code>LifecycleOwner</code> is responsible to wire up a <code>View</code> to a <code>ViewModel</code>, delegate callbacks from the Android OS, handle configuration changes and more.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SignUpFragment</span> : Fragment() {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Retain the instance across configuration changes.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> viewModel <span style=color:#66d9ef>by</span> retain { entry <span style=color:#f92672>-&gt;</span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>val</span> repository: SignUpRepository = <span style=color:#75715e>// creates the repository
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            SignUpViewModel(entry.savedStateHandle, entry.scope, repository)
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Creates your View and connects to the ViewModel.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>override</span> <span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>onCreateView</span>(
+</span></span><span style=display:flex><span>        inflater: LayoutInflater,
+</span></span><span style=display:flex><span>        container: ViewGroup?,
+</span></span><span style=display:flex><span>        savedInstanceState: Bundle?
+</span></span><span style=display:flex><span>    ): View? {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>val</span> view = SignUpView(requireContext())
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Bind the View and ViewModel
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        view.onSignUpClicked = viewModel<span style=color:#f92672>::</span>onSignUpClicked
+</span></span><span style=display:flex><span>        view.onCancelClicked = viewModel<span style=color:#f92672>::</span>onCancelClicked
+</span></span><span style=display:flex><span>        viewModel.email.observeIn(viewLifecycleOwner, view<span style=color:#f92672>::</span>email<span style=color:#f92672>::</span><span style=color:#66d9ef>set</span>)
+</span></span><span style=display:flex><span>        viewModel.password.observeIn(viewLifecycleOwner, view<span style=color:#f92672>::</span>password<span style=color:#f92672>::</span><span style=color:#66d9ef>set</span>)
+</span></span><span style=display:flex><span>        viewModel.isSignUpEnabled.observeIn(viewLifecycleOwner, view<span style=color:#f92672>::</span>isSignUpEnabled<span style=color:#f92672>::</span><span style=color:#66d9ef>set</span>)
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Other binds you might need with the view...
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        viewModel.navigation.observeIn(viewLifecycleOwner) { navigation <span style=color:#f92672>-&gt;</span>
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// Handle navigation.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        }
+</span></span><span style=display:flex><span>        viewModel.toastMessage.observeIn(viewLifecycleOwner) { message <span style=color:#f92672>-&gt;</span>
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// Handle toast message.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> view
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h1 id=testing>Testing<a hidden class=anchor aria-hidden=true href=#testing>#</a></h1><p>We designed our View as a Humble Object to let us quickly test both <code>View</code> and <code>ViewModel</code>. As you might have perceived, the <code>ViewModel</code> is straightforward to write tests as we do not depend on any Android related class.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SignUpViewModelTest</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> scope = TestCoroutineScope()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#75715e>// A fake version of the data source to not cross boundaries like network and database.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>val</span> dataSource = TestDataSource()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>createSut</span>(): SignUpViewModel {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> SignUpViewModel(SavedStateHandle(), scope, SignUpRepository(dataSource))
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#75715e>// Set up, tear down, other tests, etc...
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>@Test</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>`given email and password field is not blank when signing up then navigate to the home`</span> {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Arrange Phase
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>val</span> sut = createSut().apply {
+</span></span><span style=display:flex><span>      email = <span style=color:#e6db74>&#34;my.fake.person@gmail.com&#34;</span>
+</span></span><span style=display:flex><span>      password = <span style=color:#e6db74>&#34;8S#@2LAaB_.NJh(Y&#34;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> actualNavigation: Navigation? = <span style=color:#66d9ef>null</span>
+</span></span><span style=display:flex><span>    scope.launch { sut.navigation.collect { actualNavigation = <span style=color:#66d9ef>it</span> } }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Act Phase
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    sut.onSignUpClicked()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Assert Phase
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>val</span> expectedNavigation = <span style=color:#a6e22e>Navigation</span>.Push(<span style=color:#a6e22e>SignUpRoutes</span>.Home)
+</span></span><span style=display:flex><span>    assertThat(actualNavigation).isEqualTo(expectedNavigation)
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>As the view is a humble object, there is nothing much to test on it. However, we might want to ensure that the UI behaves as expected when the <code>ViewModel</code> changes its attributes. For example:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SignUpViewTest</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>@Test</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>`given sign up is disabled then the button should not be clickable`</span>() {
+</span></span><span style=display:flex><span>    launchViewInFragment { SignUpView(requireContext()) }
+</span></span><span style=display:flex><span>      .onView { <span style=color:#66d9ef>it</span>.isSignUpEnabled = <span style=color:#66d9ef>false</span> }
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    onView(withId(<span style=color:#a6e22e>R</span>.id.signUpButton))
+</span></span><span style=display:flex><span>      .check(matches(not(isEnabled())))
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h1 id=conclusion>Conclusion<a hidden class=anchor aria-hidden=true href=#conclusion>#</a></h1><p>It is relatively easy to see that <code>View</code>&rsquo;s, in Android, are strongly tied to the concept of their functionality. Humble View&rsquo;s is a way to create a clear separation between them and the Android Framework aiming for scalability, readability, and maybe the most essential point, testing.</p><p>In this article, we applied Humble Object pattern and MVVM concepts to create the circumstances that would allow developers to test <code>View</code>&rsquo;s and <code>ViewModel</code>&rsquo;s with ease even when they are strongly tied conceptually. Additionally, understanding that the <code>LifecycleOwner</code> is not your <code>View</code> will help you to ensure your code is highly testable.</p><p>Other than testing, projects that use this approach can easily compose more complex <code>View</code>&rsquo;s, and <code>ViewModel</code>&rsquo;s, from smaller objects. Lastly, this approach fit with Jetpack&rsquo;s Compose: replace the <code>View</code> with a <code>@Composable</code> and reuse the <code>ViewModel</code>!</p><p><strong>Happy Coding!</strong> 😎</p><h1 id=helper-functions--credits>Helper functions & credits!<a hidden class=anchor aria-hidden=true href=#helper-functions--credits>#</a></h1><p>I used <a href=http://github.com/marcellogalhardo/retained>Retained</a> library to keep the state of the <code>ViewModel</code> in configuration changes. I also published all the helper functions as <a href=https://gist.github.com/marcellogalhardo/a9985f7b3875fa41c379a2ba65d8ac9c>Github GISTs</a>, so you can use them as you please.</p><p>Special thanks to <a href=https://twitter.com/maryte_chietera>Maria Chietera</a>, <a href=https://twitter.com/TiagoDvl>Tiago Dávila</a>, <a href=https://twitter.com/orafaaraujo>Rafael Araujo</a>, <a href=https://twitter.com/laggedHero>Tiago Cunha</a>, <a href=https://twitter.com/felipeapedroso>Felipe Pedroso</a>, and <a href=https://twitter.com/s_anastasov>Stojan Anastasov</a> proofread review! 🔍</p><p>If you like my posts, follow me on Twitter: <a href=https://twitter.com/marcellogalhard>@marcellogalhard</a></p></div><footer class=post-footer><ul class=post-tags><li><a href=https://marcellogalhardo.dev/tags/android/>android</a></li><li><a href=https://marcellogalhardo.dev/tags/kotlin/>kotlin</a></li></ul></footer></article></main><footer class=footer><div class=footer__inner><div class=footer__content><span>&copy; 2022</span>
+<span><a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></span><span><a href=https://marcellogalhardo.dev/posts/index.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a></span></div></div></footer></body></html>
